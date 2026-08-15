@@ -70,8 +70,8 @@ public class IrisRenderSystem {
 		hasMultibind = GL.getCapabilities().OpenGL45 || GL.getCapabilities().GL_ARB_multi_bind;
 		perspectiveProjectionMatrixBuffer = new ProjectionMatrixBuffer("Iris shadow map projection");
 
-		supportsCompute = GL.getCapabilities().glDispatchCompute != MemoryUtil.NULL;
-		supportsTesselation = GL.getCapabilities().GL_ARB_tessellation_shader || GL.getCapabilities().OpenGL40;
+		supportsCompute = GL.getCapabilities().glDispatchCompute != MemoryUtil.NULL || (net.quasar.mobile.QuasarContext.isGLES() && (net.quasar.mobile.QuasarContext.getEsMajor() > 3 || (net.quasar.mobile.QuasarContext.getEsMajor() == 3 && net.quasar.mobile.QuasarContext.getEsMinor() >= 1)));
+		supportsTesselation = GL.getCapabilities().GL_ARB_tessellation_shader || GL.getCapabilities().OpenGL40 || (net.quasar.mobile.QuasarContext.isGLES() && (net.quasar.mobile.QuasarContext.getEsMajor() > 3 || (net.quasar.mobile.QuasarContext.getEsMajor() == 3 && net.quasar.mobile.QuasarContext.getEsMinor() >= 2)));
 
 		samplers = new int[SamplerLimits.get().getMaxTextureUnits()];
 	}

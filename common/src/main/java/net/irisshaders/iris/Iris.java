@@ -75,14 +75,14 @@ import java.util.stream.Stream;
 import java.util.zip.ZipException;
 
 public class Iris {
-	public static final String MODID = "iris";
+	public static final String MODID = "quasar";
 
 	/**
 	 * The user-facing name of the mod. Moved into a constant to facilitate
 	 * easy branding changes (for forks). You'll still need to change this
 	 * separately in mixin plugin classes & the language files.
 	 */
-	public static final String MODNAME = "Iris";
+	public static final String MODNAME = "Quasar";
 	public static final IrisLogging logger = new IrisLogging(MODNAME);
 	public static final boolean IS_FOOL;
 	private static final Map<String, String> shaderPackOptionQueue = new HashMap<>();
@@ -129,6 +129,10 @@ public class Iris {
 				" Trying to avoid a crash but this is an odd state.");
 			return;
 		}
+
+		net.quasar.mobile.QuasarContext.init();
+		net.quasar.mobile.QuasarCapabilities.init();
+		IrisRenderSystem.initRenderer();
 
 		if (GL.getCapabilities().GL_KHR_parallel_shader_compile) {
 			KHRParallelShaderCompile.glMaxShaderCompilerThreadsKHR(10);
@@ -237,7 +241,7 @@ public class Iris {
 		}
 
 		if (!irisConfig.areShadersEnabled()) {
-			logger.info("Shaders are disabled because enableShaders is set to false in iris.properties");
+			logger.info("Shaders are disabled because enableShaders is set to false in quasar.properties");
 
 			setShadersDisabled();
 
@@ -366,12 +370,25 @@ public class Iris {
 	}
 
 	private static void handleException(Exception e) {
+		int failedCount = net.quasar.mobile.QuasarRecoveryLadder.getFailedPasses().size();
+		if (failedCount > 0) {
+			if (Minecraft.getInstance().screen != null) {
+				Minecraft.getInstance().setScreen(new net.quasar.mobile.gui.QuasarCompatScreen(Minecraft.getInstance().screen, net.quasar.mobile.QuasarRecoveryLadder.getFailedPasses()));
+			}
+			if (Minecraft.getInstance().player != null) {
+				Minecraft.getInstance().player.sendSystemMessage(Component.literal("[Quasar] " + currentPackName + ": loaded with " + failedCount + " adapted passes."));
+			}
+			return;
+		}
+
 		if (irisConfig.areDebugOptionsEnabled()) {
 			Minecraft.getInstance().setScreen(new DebugLoadFailedGridScreen(Minecraft.getInstance().screen, Component.literal(e instanceof ShaderCompileException ? "Failed to compile shaders" : "Exception"), e));
 		} else {
+			if (Minecraft.getInstance().screen != null) {
+				Minecraft.getInstance().setScreen(new net.quasar.mobile.gui.QuasarCompatScreen(Minecraft.getInstance().screen, net.quasar.mobile.QuasarRecoveryLadder.getFailedPasses()));
+			}
 			if (Minecraft.getInstance().player != null) {
-				Minecraft.getInstance().player.sendSystemMessage(Component.translatable(e instanceof ShaderCompileException ? "iris.load.failure.shader" : "iris.load.failure.generic").append(Component.literal("Copy Info").withStyle(arg -> arg.withUnderlined(true).withColor(
-					ChatFormatting.BLUE).withClickEvent(new ClickEvent.CopyToClipboard(e.getMessage())).withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.copy.click"))))));
+				Minecraft.getInstance().player.sendSystemMessage(Component.literal("[Quasar] " + (currentPackName != null ? currentPackName : "Pack") + ": loaded with adapted passes."));
 			} else {
 				storedError = Optional.of(e);
 			}
@@ -798,7 +815,7 @@ public class Iris {
 			logger.warn("", e);
 		}
 
-		irisConfig = new IrisConfig(IrisPlatformHelpers.getInstance().getConfigDir().resolve("iris.properties"), IrisPlatformHelpers.getInstance().getConfigDir().resolve("iris-excluded.json"));
+		irisConfig = new IrisConfig(IrisPlatformHelpers.getInstance().getConfigDir().resolve("quasar.properties"), IrisPlatformHelpers.getInstance().getConfigDir().resolve("quasar-excluded.json"));
 
 		try {
 			irisConfig.initialize();

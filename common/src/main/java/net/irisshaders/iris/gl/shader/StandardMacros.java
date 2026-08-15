@@ -13,6 +13,7 @@ import net.irisshaders.iris.pbr.format.TextureFormat;
 import net.irisshaders.iris.pbr.format.TextureFormatLoader;
 import net.irisshaders.iris.pipeline.WorldRenderingPhase;
 import net.irisshaders.iris.platform.IrisPlatformHelpers;
+import net.quasar.mobile.QuasarContext;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
@@ -203,12 +204,20 @@ public class StandardMacros {
 	 * @see <a href="https://github.com/sp614x/optifine/blob/9c6a5b5326558ccc57c6490b66b3be3b2dc8cbef/OptiFineDoc/doc/shaders.txt#L705-L707">Optifine Doc for GLSL Version</a>
 	 */
 	public static String getGlVersion(int name) {
-		String info = GlStateManager._getString(name);
+		if (QuasarContext.isGLES()) {
+			return "460";
+		}
 
-		Matcher matcher = SEMVER_PATTERN.matcher(Objects.requireNonNull(info));
+		String info = GlStateManager._getString(name);
+		if (info == null) {
+			return "460";
+		}
+
+		Matcher matcher = SEMVER_PATTERN.matcher(info);
 
 		if (!matcher.matches()) {
-			throw new IllegalStateException("Could not parse GL version from \"" + info + "\"");
+			Iris.logger.warn("Could not parse GL version from \"" + info + "\", using fallback 460");
+			return "460";
 		}
 
 		String major = group(matcher, "major");

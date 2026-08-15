@@ -52,6 +52,7 @@ public class IrisConfig {
 	 * If the update notification should be disabled or not.
 	 */
 	private boolean disableUpdateMessage;
+	private boolean useLegacyUi = false;
 
 	public IrisConfig(Path propertiesPath, Path excluded) {
 		shaderPackName = null;
@@ -59,8 +60,17 @@ public class IrisConfig {
 		allowUnknownShaders = false;
 		enableDebugOptions = false;
 		disableUpdateMessage = false;
+		useLegacyUi = false;
 		this.propertiesPath = propertiesPath;
 		this.excludedPath = excluded;
+	}
+
+	public boolean isUseLegacyUi() {
+		return useLegacyUi;
+	}
+
+	public void setUseLegacyUi(boolean useLegacyUi) {
+		this.useLegacyUi = useLegacyUi;
 	}
 
 	/**
@@ -174,6 +184,7 @@ public class IrisConfig {
 		allowUnknownShaders = "true".equals(properties.getProperty("allowUnknownShaders"));
 		enableDebugOptions = "true".equals(properties.getProperty("enableDebugOptions"));
 		disableUpdateMessage = "true".equals(properties.getProperty("disableUpdateMessage"));
+		useLegacyUi = "true".equals(properties.getProperty("useLegacyUi"));
 		try {
 			IrisVideoSettings.shadowDistance = Integer.parseInt(properties.getProperty("maxShadowRenderDistance", "32"));
 			IrisVideoSettings.colorSpace = ColorSpace.valueOf(properties.getProperty("colorSpace", "SRGB"));
@@ -203,6 +214,7 @@ public class IrisConfig {
 		properties.setProperty("allowUnknownShaders", allowUnknownShaders ? "true" : "false");
 		properties.setProperty("enableDebugOptions", enableDebugOptions ? "true" : "false");
 		properties.setProperty("disableUpdateMessage", disableUpdateMessage ? "true" : "false");
+		properties.setProperty("useLegacyUi", useLegacyUi ? "true" : "false");
 		properties.setProperty("maxShadowRenderDistance", String.valueOf(IrisVideoSettings.shadowDistance));
 		properties.setProperty("colorSpace", IrisVideoSettings.colorSpace.name());
 		// NB: This uses ISO-8859-1 with unicode escapes as the encoding

@@ -33,7 +33,7 @@ repositories {
 }
 
 base {
-    archivesName.set("iris-fabric")
+    archivesName.set("quasar-fabric")
 }
 
 dependencies {
@@ -41,30 +41,12 @@ dependencies {
 
     implementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
 
-    fun addRuntimeFabricModule(name: String) {
-        val module = fabricApi.module(name, FABRIC_API_VERSION)
-        runtimeOnly(module)
-    }
-
-    fun addEmbeddedFabricModule(name: String) {
-        val module = fabricApi.module(name, FABRIC_API_VERSION)
-        implementation(module)
-        include(module)
-    }
-
     fun implementAndInclude(name: String) {
         implementation(name)
         include(name)
     }
 
-    // Fabric API modules
-    addEmbeddedFabricModule("fabric-api-base")
-    addEmbeddedFabricModule("fabric-key-mapping-api-v1")
-    addRuntimeFabricModule("fabric-block-getter-api-v2")
-    addRuntimeFabricModule("fabric-rendering-fluids-v1")
-    addRuntimeFabricModule("fabric-resource-loader-v0")
-    addRuntimeFabricModule("fabric-lifecycle-events-v1")
-    addRuntimeFabricModule("fabric-renderer-api-v1")
+    implementation("net.fabricmc.fabric-api:fabric-api:$FABRIC_API_VERSION")
 
     implementation(SODIUM_DEPENDENCY_FABRIC)
     implementAndInclude("org.antlr:antlr4-runtime:4.13.1")
@@ -93,7 +75,7 @@ loom {
 
     @Suppress("UnstableApiUsage")
     mixin {
-        defaultRefmapName.set("iris-fabric.refmap.json")
+        defaultRefmapName.set("quasar-fabric.refmap.json")
         useLegacyMixinAp = false
     }
 
@@ -103,17 +85,6 @@ loom {
             configName = "Fabric Client"
             ideConfigGenerated(true)
             runDir("run")
-           // vmArgs("-Dmixin.debug.export=true")
-           // vmArg("-XX:+AllowEnhancedClassRedefinition")
-        }
-        create("clientWithRenderdoc") {
-            client()
-            configName = "Fabric Client"
-            ideConfigGenerated(true)
-            runDir("run")
-            environmentVariable("LD_PRELOAD", "/home/ims/renderdoc/build/lib/librenderdoc.so")
-            vmArgs("-DMC_DEBUG_ENABLED=true", "-DMC_DEBUG_DUMP_TEXTURE_ATLAS=true")
-            programArgs("--renderDebugLabels")
         }
     }
 }

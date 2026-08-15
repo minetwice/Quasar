@@ -209,22 +209,25 @@ public class ShaderCreator {
 	private static int createShader(String name, ShaderType shaderType, String source) {
 		if (source == null) return -1;
 
-		int shader = GlStateManager.glCreateShader(shaderType.id);
-		GlStateManager.glShaderSource(shader, source);
-		GlStateManager.glCompileShader(shader);
-		String log = IrisRenderSystem.getShaderInfoLog(shader);
+		return net.quasar.mobile.QuasarRecoveryLadder.compileWithLadder(shaderType, name, source, transpiledSource -> {
+			int shader = GlStateManager.glCreateShader(shaderType.id);
+			GlStateManager.glShaderSource(shader, transpiledSource);
+			GlStateManager.glCompileShader(shader);
+			String log = IrisRenderSystem.getShaderInfoLog(shader);
 
-		if (!log.isEmpty()) {
-			Iris.logger.warn("Shader compilation log for " + name + ": " + log);
-		}
+			if (!log.isEmpty()) {
+				Iris.logger.warn("Shader compilation log for " + name + ": " + log);
+			}
 
-		int result = GlStateManager.glGetShaderi(shader, GL20C.GL_COMPILE_STATUS);
+			int result = GlStateManager.glGetShaderi(shader, GL20C.GL_COMPILE_STATUS);
 
-		if (result != GL20C.GL_TRUE) {
-			throw new ShaderCompileException(name, log);
-		}
+			if (result != GL20C.GL_TRUE) {
+				GlStateManager.glDeleteShader(shader);
+				throw new ShaderCompileException(name, log);
+			}
 
-		return shader;
+			return shader;
+		});
 	}
 
 	public static ShaderSupplier createFallback(String name, ShaderKey shaderKey, GlFramebuffer writingToBeforeTranslucent,

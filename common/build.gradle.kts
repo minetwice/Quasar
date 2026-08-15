@@ -54,9 +54,7 @@ dependencies {
 
     implementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
 
-    compileOnly(fabricApi.module("fabric-resource-loader-v1", FABRIC_API_VERSION))
-    compileOnly(fabricApi.module("fabric-block-getter-api-v2", FABRIC_API_VERSION))
-    compileOnly(fabricApi.module("fabric-renderer-api-v1", FABRIC_API_VERSION))
+    compileOnly("net.fabricmc.fabric-api:fabric-api:$FABRIC_API_VERSION")
 
     implementation(SODIUM_DEPENDENCY_FABRIC)
     compileOnly("org.antlr:antlr4-runtime:4.13.1")
@@ -64,13 +62,6 @@ dependencies {
     compileOnly("org.anarres:jcpp:1.4.14")
 
     compileOnly(files(rootDir.resolve("DHApi.jar")))
-}
-
-afterEvaluate {
-    tasks.withType<JavaCompile> {
-        options.compilerArgs.add("-Xmaxerrs")
-        options.compilerArgs.add("2000")
-    }
 }
 
 val vendoredJar by tasks.registering(Jar::class) {
@@ -110,24 +101,6 @@ sourceSets {
     val vendored = create("vendored")
     val desktop = getByName("desktop")
 
-    headers.apply {
-        java {
-            compileClasspath += main.compileClasspath
-        }
-    }
-
-    vendored.apply {
-        java {
-            compileClasspath += main.compileClasspath
-        }
-    }
-
-    api.apply {
-        java {
-            compileClasspath += main.compileClasspath
-        }
-    }
-
     desktop.apply {
         java {
             srcDir("src/desktop/java")
@@ -145,12 +118,6 @@ sourceSets {
     }
 }
 
-artifacts {
-    add("vendoredJar", vendoredJar)
-    add("apiJar", apiJar)
-    add("headersJar", headersJar)
-}
-
 loom {
     mixin {
         defaultRefmapName = "iris.refmap.json"
@@ -160,11 +127,33 @@ loom {
     accessWidenerPath = file("src/main/resources/iris.accesswidener")
 
     mods {
-        val main by creating { // to match the default mod generated for Forge
+        val main by creating {
+            sourceSet("headers")
             sourceSet("vendored")
+            sourceSet("api")
+            sourceSet("desktop")
             sourceSet("main")
         }
     }
+}
+
+afterEvaluate {
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.add("-Xmaxerrs")
+        options.compilerArgs.add("2000")
+    }
+
+    val compileClasspath = configurations.named("compileClasspath").get()
+    configurations.named("apiCompileClasspath").configure { extendsFrom(compileClasspath) }
+    configurations.named("headersCompileClasspath").configure { extendsFrom(compileClasspath) }
+    configurations.named("vendoredCompileClasspath").configure { extendsFrom(compileClasspath) }
+    configurations.named("desktopCompileClasspath").configure { extendsFrom(compileClasspath) }
+}
+
+artifacts {
+    add("vendoredJar", vendoredJar)
+    add("apiJar", apiJar)
+    add("headersJar", headersJar)
 }
 
 tasks {
@@ -173,9 +162,10 @@ tasks {
             expand(mapOf("version" to project.version))
         }
     }
+
     getByName<JavaCompile>("compileDesktopJava") {
-        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
-        targetCompatibility = JavaVersion.VERSION_1_8.toString()
+        sourceCompatibility = JavaVersion.VERSION_21.toString()
+        targetCompatibility = JavaVersion.VERSION_21.toString()
     }
 
     jar {

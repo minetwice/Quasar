@@ -59,22 +59,35 @@ public class GlFramebuffer extends GlResource {
 	}
 
 	public void drawBuffers(int[] buffers) {
-		int[] glBuffers = new int[buffers.length];
-		int index = 0;
-
-		if (buffers.length > maxDrawBuffers) {
-			throw new IllegalArgumentException("Cannot write to more than " + maxDrawBuffers + " draw buffers on this GPU");
+		int maxAllowed = net.quasar.mobile.QuasarCapabilities.getMaxDrawBuffers();
+		if (buffers.length > maxAllowed) {
+			net.irisshaders.iris.Iris.logger.warn("Draw buffers requested (" + buffers.length + ") exceeds max supported (" + maxAllowed + "), clamping extra buffers.");
 		}
 
-		for (int buffer : buffers) {
-			if (buffer >= maxColorAttachments) {
-				throw new IllegalArgumentException("Only " + maxColorAttachments + " color attachments are supported on this GPU, but an attempt was made to write to a color attachment with index " + buffer);
-			}
+		int count = Math.min(buffers.length, maxAllowed);
+		int[] glBuffers = new int[count];
+		int index = 0;
 
-			glBuffers[index++] = GL30C.GL_COLOR_ATTACHMENT0 + buffer;
+		for (int i = 0; i < count; i++) {
+			int buffer = buffers[i];
+			if (buffer >= maxColorAttachments) {
+				glBuffers[index++] = GL30C.GL_NONE;
+			} else {
+				glBuffers[index++] = GL30C.GL_COLOR_ATTACHMENT0 + buffer;
+			}
 		}
 
 		IrisRenderSystem.drawBuffers(getGlId(), glBuffers);
+	}
+
+	public void clearAttachments() {
+		bind();
+		for (int attachmentIndex : attachments.keySet()) {
+			IrisRenderSystem.clearBufferfv(getGlId(), GL30C.GL_COLOR, attachmentIndex, new float[]{0.0f, 0.0f, 0.0f, 0.0f});
+		}
+		if (hasDepthAttachment) {
+			IrisRenderSystem.clearBufferfv(getGlId(), GL30C.GL_DEPTH, 0, new float[]{1.0f});
+		}
 	}
 
 	public void readBuffer(int buffer) {
@@ -108,7 +121,19 @@ public class GlFramebuffer extends GlResource {
 	public int getStatus() {
 		bind();
 
-		return IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
+		int status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
+		if (status != GL30C.GL_FRAMEBUFFER_COMPLETE && net.quasar.mobile.QuasarContext.isGLES()) {
+			for (int attempt = 1; attempt <= 3; attempt++) {
+				net.irisshaders.iris.Iris.logger.warn("[Quasar] Framebuffer incomplete (" + status + "), attempting repair attempt " + attempt + "...");
+				status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
+				if (status == GL30C.GL_FRAMEBUFFER_COMPLETE) {
+					net.irisshaders.iris.Iris.logger.info("[Quasar] FBO repaired successfully.");
+					break;
+				}
+			}
+		}
+
+		return status;
 	}
 
 	public int getId() {

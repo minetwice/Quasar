@@ -1,4 +1,3 @@
-
 plugins {
     id("java")
     id("net.fabricmc.fabric-loom") version("1.15.4") apply(false)
@@ -13,11 +12,9 @@ val SODIUM_DEPENDENCY_FABRIC by extra { "net.caffeinemc:sodium-fabric:0.9.1+mc26
 val SODIUM_DEPENDENCY_NEO by extra { "net.caffeinemc:sodium-neoforge-mod:0.9.1+mc26.1.2" }
 
 // This value can be set to null to disable Parchment.
-// TODO: Re-add Parchment
 val PARCHMENT_VERSION by extra { null }
 
-// https://semver.org/
-val MOD_VERSION by extra { "1.11.2" }
+val MOD_VERSION by extra { "1.0.0-quasar" }
 
 allprojects {
     apply(plugin = "java")
@@ -36,7 +33,6 @@ subprojects {
     apply(plugin = "maven-publish")
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(25)
-
 
     fun createVersionString(): String {
         val builder = StringBuilder()
@@ -71,16 +67,14 @@ subprojects {
     }
 
     version = createVersionString()
-    group = "net.irisshaders"
+    group = "net.quasar"
 
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
         options.release.set(25)
     }
 
-    // Disables Gradle's custom module metadata from being published to maven. The
-    // metadata includes mapped dependencies which are not reasonably consumable by
-    // other mod developers.
+    // Disables Gradle's custom module metadata from being published to maven.
     tasks.withType<GenerateModuleMetadata>().configureEach {
         enabled = false
     }
