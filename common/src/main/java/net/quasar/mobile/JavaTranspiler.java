@@ -326,8 +326,35 @@ public class JavaTranspiler {
 					    );
 					}
 					mat4 quasar_inverse(mat4 m) {
-					    // Simple mat4 inverse approximation
-					    return m; // fallback for shader compatibility
+					    float n11 = m[0][0], n12 = m[1][0], n13 = m[2][0], n14 = m[3][0];
+					    float n21 = m[0][1], n22 = m[1][1], n23 = m[2][1], n24 = m[3][1];
+					    float n31 = m[0][2], n32 = m[1][2], n33 = m[2][2], n34 = m[3][2];
+					    float n41 = m[0][3], n42 = m[1][3], n43 = m[2][3], n44 = m[3][3];
+					    float t11 = n23*n34*n42 - n24*n33*n42 + n24*n32*n43 - n22*n34*n43 - n23*n32*n44 + n22*n33*n44;
+					    float t12 = n14*n33*n42 - n13*n34*n42 - n14*n32*n43 + n12*n34*n43 + n13*n32*n44 - n12*n33*n44;
+					    float t13 = n13*n24*n42 - n14*n23*n42 + n14*n22*n43 - n12*n24*n43 - n13*n22*n44 + n12*n23*n44;
+					    float t14 = n14*n23*n32 - n13*n24*n32 - n14*n22*n33 + n12*n24*n33 + n13*n22*n34 - n12*n23*n34;
+					    float det = n11*t11 + n21*t12 + n31*t13 + n41*t14;
+					    if (abs(det) < 1e-6) return mat4(1.0);
+					    float invDet = 1.0 / det;
+					    float t21 = n24*n33*n41 - n23*n34*n41 - n24*n31*n43 + n21*n34*n43 + n23*n31*n44 - n21*n33*n44;
+					    float t22 = n13*n34*n41 - n14*n33*n41 + n14*n31*n43 - n11*n34*n43 - n13*n31*n44 + n11*n33*n44;
+					    float t23 = n14*n23*n41 - n13*n24*n41 - n14*n21*n43 + n11*n24*n43 + n13*n21*n44 - n11*n23*n44;
+					    float t24 = n13*n24*n31 - n14*n23*n31 + n14*n21*n33 - n11*n24*n33 - n13*n21*n34 + n11*n23*n34;
+					    float t31 = n22*n34*n41 - n24*n32*n41 + n24*n31*n42 - n21*n34*n42 - n22*n31*n44 + n21*n32*n44;
+					    float t32 = n14*n32*n41 - n12*n34*n41 - n14*n31*n42 + n11*n34*n42 + n12*n31*n44 - n11*n32*n44;
+					    float t33 = n12*n24*n41 - n14*n22*n41 + n14*n21*n42 - n11*n24*n42 - n12*n21*n44 + n11*n22*n44;
+					    float t34 = n14*n22*n31 - n12*n24*n31 - n14*n21*n32 + n11*n24*n32 + n12*n21*n34 - n11*n22*n34;
+					    float t41 = n23*n32*n41 - n22*n33*n41 - n23*n31*n42 + n21*n33*n42 + n22*n31*n43 - n21*n32*n43;
+					    float t42 = n12*n33*n41 - n13*n32*n41 + n13*n31*n42 - n11*n33*n42 - n12*n31*n43 + n11*n32*n43;
+					    float t43 = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
+					    float t44 = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
+					    return mat4(
+					        t11*invDet, t12*invDet, t13*invDet, t14*invDet,
+					        t21*invDet, t22*invDet, t23*invDet, t24*invDet,
+					        t31*invDet, t32*invDet, t33*invDet, t34*invDet,
+					        t41*invDet, t42*invDet, t43*invDet, t44*invDet
+					    );
 					}
 					""";
 				int insertIdx = findDeclarationPoint(code);
@@ -437,18 +464,18 @@ public class JavaTranspiler {
 	}
 
 	private static boolean containsWord(StringBuilder code, String word) {
-		return code.indexOf(word) != -1;
+		Pattern p = Pattern.compile("\\b" + Pattern.quote(word) + "\\b");
+		return p.matcher(code.toString()).find();
 	}
 
 	private static void replaceAllWord(StringBuilder code, String target, String replacement) {
-		int idx = 0;
-		while ((idx = code.indexOf(target, idx)) != -1) {
-			code.replace(idx, idx + target.length(), replacement);
-			idx += replacement.length();
-		}
+		String regex = "\\b" + Pattern.quote(target) + "\\b";
+		String res = code.toString().replaceAll(regex, Matcher.quoteReplacement(replacement));
+		code.setLength(0);
+		code.append(res);
 	}
 
 	private static void replaceFunctionCall(StringBuilder code, String oldFunc, String newFunc) {
-		replaceAllWord(code, oldFunc + "(", newFunc + "(");
+		replaceAllWord(code, oldFunc, newFunc);
 	}
 }

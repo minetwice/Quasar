@@ -31,41 +31,45 @@ public class QuasarTranspiler {
 			return source;
 		}
 
-		// Requirement 3.3: Desktop GL contexts -> passthrough
-		if (QuasarContext.isDesktop()) {
-			return source;
-		}
-
-		// Try loading from SHA-256 cache first
-		String cacheKey = computeHash(source + "_" + QuasarContext.getEsVersionString() + "_L" + ladderLevel + "_" + kind);
-		String cached = readFromCache(cacheKey);
-		if (cached != null) {
-			return cached;
-		}
-
-		String transpiled;
-		String mode;
-
-		// Requirement 3.2: Try native first; fallback to Java
 		try {
-			if (NativeTranspiler.isAvailable()) {
-				transpiled = NativeTranspiler.transpile(source, kind.ordinal(), QuasarContext.getEsMajor() * 10 + QuasarContext.getEsMinor());
-				mode = "native";
-			} else {
+			// Requirement 3.3: Desktop GL contexts -> passthrough
+			if (QuasarContext.isDesktop()) {
+				return source;
+			}
+
+			// Try loading from SHA-256 cache first
+			String cacheKey = computeHash(source + "_" + QuasarContext.getEsVersionString() + "_L" + ladderLevel + "_" + kind);
+			String cached = readFromCache(cacheKey);
+			if (cached != null) {
+				return cached;
+			}
+
+			String transpiled;
+			String mode;
+
+			// Requirement 3.2: Try native first; fallback to Java
+			try {
+				if (NativeTranspiler.isAvailable()) {
+					transpiled = NativeTranspiler.transpile(source, kind.ordinal(), QuasarContext.getEsMajor() * 10 + QuasarContext.getEsMinor());
+					mode = "native";
+				} else {
+					transpiled = JavaTranspiler.transpile(source, kind, programName, ladderLevel);
+					mode = "java";
+				}
+			} catch (Throwable t) {
 				transpiled = JavaTranspiler.transpile(source, kind, programName, ladderLevel);
 				mode = "java";
 			}
+
+			saveToCache(cacheKey, transpiled);
+
+			Iris.logger.info(programName + ": transpiled via " + mode + " (L" + ladderLevel + ")");
+
+			return transpiled;
 		} catch (Throwable t) {
-			transpiled = JavaTranspiler.transpile(source, kind, programName, ladderLevel);
-			mode = "java";
+			Iris.logger.error("[Quasar] hook transpile failed -> passthrough", t);
+			return source;
 		}
-
-		saveToCache(cacheKey, transpiled);
-
-		// Requirement 3.18
-		Iris.logger.info(programName + ": transpiled via " + mode + " (L" + ladderLevel + ")");
-
-		return transpiled;
 	}
 
 	private static synchronized Path getCacheDir() {
