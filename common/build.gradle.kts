@@ -23,6 +23,7 @@ repositories {
 }
 
 val MINECRAFT_VERSION: String by rootProject.extra
+val MOJANG_MINECRAFT_VERSION: String by rootProject.extra
 val PARCHMENT_VERSION: String? by rootProject.extra
 val FABRIC_LOADER_VERSION: String by rootProject.extra
 val SODIUM_DEPENDENCY_FABRIC: Any by rootProject.extra
@@ -47,12 +48,12 @@ buildConfig {
 }
 
 dependencies {
-    minecraft(group = "com.mojang", name = "minecraft", version = MINECRAFT_VERSION)
+    minecraft(group = "com.mojang", name = "minecraft", version = MOJANG_MINECRAFT_VERSION)
 
     mappings(loom.layered() {
         officialMojangMappings()
         if (PARCHMENT_VERSION != null) {
-            parchment("org.parchmentmc.data:parchment-${MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
+            parchment("org.parchmentmc.data:parchment-${MOJANG_MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
         }
     })
 
@@ -140,8 +141,8 @@ tasks {
         }
     }
     getByName<JavaCompile>("compileDesktopJava") {
-        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
-        targetCompatibility = JavaVersion.VERSION_1_8.toString()
+        sourceCompatibility = JavaVersion.VERSION_21.toString()
+        targetCompatibility = JavaVersion.VERSION_21.toString()
     }
 
     jar {

@@ -5,9 +5,10 @@ plugins {
 }
 
 val MINECRAFT_VERSION by extra { "1.21.11" }
+val MOJANG_MINECRAFT_VERSION by extra { "1.21.1" }
 val NEOFORGE_VERSION by extra { "21.11.5-beta" }
 val FABRIC_LOADER_VERSION by extra { "0.18.1" }
-val FABRIC_API_VERSION by extra { "0.140.2+1.21.11" }
+val FABRIC_API_VERSION by extra { "0.102.0+1.21.1" }
 
 val SODIUM_DEPENDENCY_FABRIC by extra { files(rootDir.resolve("custom_sodium/sodium-fabric-0.8.7+mc1.21.11.jar")) }
 val SODIUM_DEPENDENCY_NEO by extra { files(rootDir.resolve("custom_sodium/net.caffeinemc.sodium-neoforge-0.8.6+mc1.21.11-mod.jar")) }

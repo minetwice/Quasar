@@ -5,6 +5,7 @@ plugins {
 }
 
 val MINECRAFT_VERSION: String by rootProject.extra
+val MOJANG_MINECRAFT_VERSION: String by rootProject.extra
 val PARCHMENT_VERSION: String? by rootProject.extra
 val FABRIC_LOADER_VERSION: String by rootProject.extra
 val FABRIC_API_VERSION: String by rootProject.extra
@@ -31,11 +32,11 @@ base {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${MINECRAFT_VERSION}")
+    minecraft("com.mojang:minecraft:${MOJANG_MINECRAFT_VERSION}")
     mappings(loom.layered {
         officialMojangMappings()
         if (PARCHMENT_VERSION != null) {
-            parchment("org.parchmentmc.data:parchment-${MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
+            parchment("org.parchmentmc.data:parchment-${MOJANG_MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
         }
     })
     modImplementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
