@@ -122,15 +122,19 @@ public class GlFramebuffer extends GlResource {
 		bind();
 
 		int status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
-		if (status != GL30C.GL_FRAMEBUFFER_COMPLETE && net.quasar.mobile.QuasarContext.isGLES()) {
-			for (int attempt = 1; attempt <= 3; attempt++) {
-				net.irisshaders.iris.Iris.logger.warn("[Quasar] Framebuffer incomplete (" + status + "), attempting repair attempt " + attempt + "...");
-				status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
-				if (status == GL30C.GL_FRAMEBUFFER_COMPLETE) {
-					net.irisshaders.iris.Iris.logger.info("[Quasar] FBO repaired successfully.");
-					break;
+		try {
+			if (status != GL30C.GL_FRAMEBUFFER_COMPLETE && net.quasar.mobile.QuasarContext.isGLES()) {
+				for (int attempt = 1; attempt <= 3; attempt++) {
+					net.irisshaders.iris.Iris.logger.warn("[Quasar] Framebuffer incomplete (" + status + "), attempting repair attempt " + attempt + "...");
+					status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
+					if (status == GL30C.GL_FRAMEBUFFER_COMPLETE) {
+						net.irisshaders.iris.Iris.logger.info("[Quasar] FBO repaired successfully.");
+						break;
+					}
 				}
 			}
+		} catch (Throwable t) {
+			net.irisshaders.iris.Iris.logger.error("[Quasar] hook FBOIncompletenessRepair failed -> passthrough", t);
 		}
 
 		return status;

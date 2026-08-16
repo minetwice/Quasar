@@ -22,11 +22,29 @@ public class QuasarTranspiler {
 
 	private static Path cacheDir;
 
+	public static String transpile(String name, String src, ShaderKind kind) {
+		try {
+			return transpileInternal(src, kind, name, 1);
+		} catch (Throwable t) {
+			net.irisshaders.iris.Iris.logger.error("[Quasar] hook QuasarTranspiler failed -> passthrough", t);
+			return src;
+		}
+	}
+
 	public static String transpile(String source, ShaderKind kind, String programName) {
-		return transpile(source, kind, programName, 1);
+		return transpile(programName, source, kind);
 	}
 
 	public static String transpile(String source, ShaderKind kind, String programName, int ladderLevel) {
+		try {
+			return transpileInternal(source, kind, programName, ladderLevel);
+		} catch (Throwable t) {
+			net.irisshaders.iris.Iris.logger.error("[Quasar] hook QuasarTranspiler failed -> passthrough", t);
+			return source;
+		}
+	}
+
+	private static String transpileInternal(String source, ShaderKind kind, String programName, int ladderLevel) {
 		if (source == null || source.isEmpty()) {
 			return source;
 		}
