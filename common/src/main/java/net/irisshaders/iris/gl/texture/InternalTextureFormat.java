@@ -9,6 +9,8 @@ import org.lwjgl.opengl.GL41C;
 
 import java.util.Locale;
 import java.util.Optional;
+import net.quasar.mobile.QuasarContext;
+import net.quasar.mobile.QuasarCapabilities;
 
 public enum InternalTextureFormat {
 	// Default
@@ -107,34 +109,36 @@ public enum InternalTextureFormat {
 		}
 	}
 
+
 	public InternalTextureFormat getDowngraded() {
-		if (!net.quasar.mobile.QuasarContext.isGLES()) {
+		try {
+			if (!QuasarContext.isGLES()) {
+				return this;
+			}
+			boolean f16 = QuasarCapabilities.canRenderFloat16();
+			boolean f32 = QuasarCapabilities.canRenderFloat32();
+
+			switch (this) {
+				case RGBA16F:
+				case RGB16F:
+					return f16 ? this : RGBA8;
+				case RGBA32F:
+				case RGB32F:
+					return f32 ? this : (f16 ? RGBA16F : RGBA8);
+				case R16F:
+				case RG16F:
+					return f16 ? this : RGBA8;
+				case R32F:
+				case RG32F:
+					return f32 ? this : (f16 ? RGBA16F : RGBA8);
+				default:
+					return this;
+			}
+		} catch (Throwable t) {
+			net.irisshaders.iris.Iris.logger.error("[Quasar] hook TextureFormatDowngrade failed -> passthrough", t);
 			return this;
 		}
-
-		boolean f16 = net.quasar.mobile.QuasarCapabilities.canRenderFloat16();
-		boolean f32 = net.quasar.mobile.QuasarCapabilities.canRenderFloat32();
-
-		switch (this) {
-			case RGBA32F:
-			case RGB32F:
-				if (f32) return this;
-				return f16 ? RGBA16F : RGBA8;
-			case R32F:
-				if (f32) return this;
-				return f16 ? R16F : R8;
-			case RG32F:
-				if (f32) return this;
-				return f16 ? RG16F : RG8;
-			case RGBA16F:
-			case RGB16F:
-				return f16 ? this : RGBA8;
-			default:
-				return this;
-		}
-	}
-
-	public int getGlFormat() {
+	}public int getGlFormat() {
 		return getDowngraded().glFormat;
 	}
 
