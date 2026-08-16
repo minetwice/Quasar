@@ -1,1 +1,9 @@
-Nothing needs to be added to .gitignore since the changes only include GitHub workflow YAML files, which are source/config files that should not be ignored.
+```
+# Gradle
+.gradle/
+build/
+
+# Logs
+*.log
+hs_err_pid*.log
+```

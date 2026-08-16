@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("net.fabricmc.fabric-loom") version("1.15.4") apply(false)
+    id("net.fabricmc.fabric-loom") version("1.17.19") apply(false)
 }
 
 val MINECRAFT_VERSION by extra { "1.21.11" }
@@ -32,7 +32,7 @@ tasks.jar {
 subprojects {
     apply(plugin = "maven-publish")
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
     fun createVersionString(): String {
         val builder = StringBuilder()
@@ -71,7 +71,7 @@ subprojects {
 
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.release.set(25)
+        options.release.set(21)
     }
 
     // Disables Gradle's custom module metadata from being published to maven.
