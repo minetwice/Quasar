@@ -56,7 +56,8 @@ dependencies {
 
     compileOnly("net.fabricmc.fabric-api:fabric-api:$FABRIC_API_VERSION")
 
-    implementation(SODIUM_DEPENDENCY_FABRIC)
+    // Sodium - runtimeOnly to avoid access widener namespace issues during compilation
+    runtimeOnly(SODIUM_DEPENDENCY_FABRIC)
     compileOnly("org.antlr:antlr4-runtime:4.13.1")
     compileOnly("io.github.douira:glsl-transformer:3.0.0-pre3")
     compileOnly("org.anarres:jcpp:1.4.14")
@@ -121,7 +122,7 @@ sourceSets {
 loom {
     mixin {
         defaultRefmapName = "iris.refmap.json"
-        useLegacyMixinAp = false
+        useLegacyMixinAp = true
     }
 
     accessWidenerPath = file("src/main/resources/iris.accesswidener")

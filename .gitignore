@@ -2,9 +2,7 @@
 # Gradle
 .gradle/
 build/
-!gradle.properties
-!gradlew
-!gradlew.bat
+target/
 
 # Dependencies
 lib/
@@ -12,15 +10,67 @@ libs/
 
 # Logs
 *.log
-!build.gradle.kts
+
+# Environment
+.env
+.env.local
+*.env.*
 
 # IDE
 .idea/
-*.iml
-*.ipr
-*.iws
 .vscode/
-.settings/
-.project
-.classpath
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Python (if applicable)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.nox/
+.pytest_cache/
+.mypy_cache/
+
+# Node (if applicable)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules/
+dist/
+build/
+
+# Compiled and binary
+*.class
+*.o
+*.obj
+*.out
+*.exe
+*.dll
+*.so
+*.a
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
 ```

@@ -8,7 +8,7 @@ val NEOFORGE_VERSION by extra { "26.1.2.10-beta" }
 val FABRIC_LOADER_VERSION by extra { "0.16.10" }
 val FABRIC_API_VERSION by extra { "0.141.6+1.21.11" }
 
-val SODIUM_DEPENDENCY_FABRIC by extra { "maven.modrinth:sodium:mc1.21.11-0.8.14-beta.2-fabric" }
+val SODIUM_DEPENDENCY_FABRIC by extra { "maven.modrinth:sodium:mc1.21.11-0.8.2-fabric" }
 val SODIUM_DEPENDENCY_NEO by extra { "net.caffeinemc:sodium-neoforge-mod:0.9.1+mc26.1.2" }
 
 // This value can be set to null to disable Parchment.
