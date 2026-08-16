@@ -1,17 +1,14 @@
 plugins {
     id("java")
     id("idea")
-    id("net.fabricmc.fabric-loom") version("1.15.4")
+    id("fabric-loom") version "1.14.4"
     id("com.github.gmazzo.buildconfig") version "5.3.5"
 }
 
 repositories {
     mavenLocal()
     maven("https://maven.parchmentmc.org/")
-    maven {
-        name = "caffeinemcRepositoryReleases"
-        url = uri("https://maven.caffeinemc.net/releases")
-    }
+
     exclusiveContent {
         forRepository {
             maven {
@@ -52,45 +49,29 @@ buildConfig {
 dependencies {
     minecraft(group = "com.mojang", name = "minecraft", version = MINECRAFT_VERSION)
 
-    implementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
+    mappings(loom.layered() {
+        officialMojangMappings()
+        if (PARCHMENT_VERSION != null) {
+            parchment("org.parchmentmc.data:parchment-${MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
+        }
+    })
 
-    compileOnly("net.fabricmc.fabric-api:fabric-api:$FABRIC_API_VERSION")
+    modImplementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
 
-    implementation(SODIUM_DEPENDENCY_FABRIC)
-    compileOnly("org.antlr:antlr4-runtime:4.13.1")
-    compileOnly("io.github.douira:glsl-transformer:3.0.0-pre3")
-    compileOnly("org.anarres:jcpp:1.4.14")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-renderer-api-v1:3.2.9+1172e897d7")
+
+    modImplementation(SODIUM_DEPENDENCY_FABRIC)
+    modCompileOnly("org.antlr:antlr4-runtime:4.13.1")
+    modCompileOnly("io.github.douira:glsl-transformer:3.0.0-pre3")
+    modCompileOnly("org.anarres:jcpp:1.4.14")
 
     compileOnly(files(rootDir.resolve("DHApi.jar")))
 }
 
-val vendoredJar by tasks.registering(Jar::class) {
-    from(sourceSets.getByName("vendored").output)
-    archiveClassifier.set("vendored")
-}
-
-val apiJar by tasks.registering(Jar::class) {
-    from(sourceSets.getByName("api").output)
-    archiveClassifier.set("api")
-}
-
-val headersJar by tasks.registering(Jar::class) {
-    from(sourceSets.getByName("headers").output)
-    archiveClassifier.set("headers")
-}
-
-configurations {
-    register("vendoredJar") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
-    }
-    register("apiJar") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
-    }
-    register("headersJar") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
+afterEvaluate {
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.add("-Xmaxerrs")
+        options.compilerArgs.add("2000")
     }
 }
 
@@ -100,6 +81,24 @@ sourceSets {
     val api = create("api")
     val vendored = create("vendored")
     val desktop = getByName("desktop")
+
+    headers.apply {
+        java {
+            compileClasspath += main.compileClasspath
+        }
+    }
+
+    vendored.apply {
+        java {
+            compileClasspath += main.compileClasspath
+        }
+    }
+
+    api.apply {
+        java {
+            compileClasspath += main.compileClasspath
+        }
+    }
 
     desktop.apply {
         java {
@@ -127,33 +126,11 @@ loom {
     accessWidenerPath = file("src/main/resources/iris.accesswidener")
 
     mods {
-        val main by creating {
-            sourceSet("headers")
+        val main by creating { // to match the default mod generated for Forge
             sourceSet("vendored")
-            sourceSet("api")
-            sourceSet("desktop")
             sourceSet("main")
         }
     }
-}
-
-afterEvaluate {
-    tasks.withType<JavaCompile> {
-        options.compilerArgs.add("-Xmaxerrs")
-        options.compilerArgs.add("2000")
-    }
-
-    val compileClasspath = configurations.named("compileClasspath").get()
-    configurations.named("apiCompileClasspath").configure { extendsFrom(compileClasspath) }
-    configurations.named("headersCompileClasspath").configure { extendsFrom(compileClasspath) }
-    configurations.named("vendoredCompileClasspath").configure { extendsFrom(compileClasspath) }
-    configurations.named("desktopCompileClasspath").configure { extendsFrom(compileClasspath) }
-}
-
-artifacts {
-    add("vendoredJar", vendoredJar)
-    add("apiJar", apiJar)
-    add("headersJar", headersJar)
 }
 
 tasks {
@@ -162,10 +139,9 @@ tasks {
             expand(mapOf("version" to project.version))
         }
     }
-
     getByName<JavaCompile>("compileDesktopJava") {
-        sourceCompatibility = JavaVersion.VERSION_21.toString()
-        targetCompatibility = JavaVersion.VERSION_21.toString()
+        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+        targetCompatibility = JavaVersion.VERSION_1_8.toString()
     }
 
     jar {

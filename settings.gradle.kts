@@ -1,3 +1,5 @@
+rootProject.name = "Iris"
+
 pluginManagement {
     repositories {
         maven { url = uri("https://maven.fabricmc.net/") }
@@ -5,7 +7,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-
-rootProject.name = "Quasar"
 
 include("common", "fabric", "neoforge")

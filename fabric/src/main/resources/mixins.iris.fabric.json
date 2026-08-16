@@ -6,7 +6,8 @@
   "compatibilityLevel": "JAVA_8",
   "client": [
     "MixinFluidRendererImpl",
-    "MixinRenderTypes"
+    "MixinParticleEngine",
+    "MixinLevelRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

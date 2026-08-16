@@ -56,7 +56,6 @@ public class StandardMacros {
 		define(standardDefines, getVendor());
 		define(standardDefines, getRenderer());
 		define(standardDefines, "IS_IRIS");
-		define(standardDefines, "IRIS_REQUIRES_SEPARATE_ENTITY_DRAWS");
 		define(standardDefines, "MAX_COLOR_BUFFERS", String.valueOf(IrisLimits.MAX_COLOR_BUFFERS));
 		define(standardDefines, "IRIS_HAS_TRANSLUCENCY_SORTING");
 		define(standardDefines, "IRIS_TAG_SUPPORT", "2");
@@ -135,9 +134,16 @@ public class StandardMacros {
 		}
 		String formattedVersion = formatVersionString(version);
 		if (formattedVersion == null) {
-			throw new IllegalStateException("Could not parse game version \"" + version + "\"");
+			Iris.logger.error("Could not parse game version \"" + version + "\"");
 		} else {
 			return formattedVersion;
+		}
+		String backupVersion = Iris.getBackupVersionNumber();
+		String formattedBackupVersion = formatVersionString(backupVersion);
+		if (formattedBackupVersion == null) {
+			throw new IllegalArgumentException("Could not parse backup game version \"" + version + "\"");
+		} else {
+			return formattedBackupVersion;
 		}
 	}
 

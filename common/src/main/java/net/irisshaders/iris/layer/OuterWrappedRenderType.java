@@ -38,11 +38,6 @@ public class OuterWrappedRenderType extends RenderType {
 	}
 
 	@Override
-	public boolean hasBlending() {
-		return wrapped.hasBlending();
-	}
-
-	@Override
 	public Optional<RenderType> outline() {
 		return this.wrapped.outline();
 	}

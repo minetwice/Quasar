@@ -1,6 +1,6 @@
 plugins {
     id("idea")
-    id("net.neoforged.moddev") version "2.0.140"
+    id("net.neoforged.moddev") version "2.0.107"
     id("java-library")
 }
 
@@ -42,7 +42,7 @@ repositories {
     }
     maven {
         name = "Maven for PR #2639" // https://github.com/neoforged/NeoForge/pull/2639
-        url = uri("https://prmaven.neoforged.net/NeoForge/pr2993")
+        url = uri("https://prmaven.neoforged.net/NeoForge/pr2639")
         content {
             includeModule("net.neoforged", "neoforge")
             includeModule("net.neoforged", "testframework")
@@ -103,7 +103,9 @@ fun includeDep(dependency: String) {
 
 fun includeAdditional(dependency: String) {
     includeDep(dependency)
-
+    dependencies {
+        "additionalRuntimeClasspath"(dependency)
+    }
 }
 
 tasks.named("compileTestJava").configure {
@@ -144,4 +146,4 @@ dependencies {
     includeAdditional("org.antlr:antlr4-runtime:4.13.1")
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)

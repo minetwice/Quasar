@@ -3,36 +3,32 @@ package net.irisshaders.iris.mixin;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.irisshaders.iris.Iris;
+import net.irisshaders.iris.layer.BlockEntityRenderStateShard;
+import net.irisshaders.iris.layer.OuterWrappedRenderType;
 import net.irisshaders.iris.uniforms.SystemTimeUniforms;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.AbstractEndPortalRenderer;
 import net.minecraft.client.renderer.blockentity.TheEndPortalRenderer;
 import net.minecraft.client.renderer.blockentity.state.EndPortalRenderState;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
-import org.joml.Vector3fc;
-import org.spongepowered.asm.mixin.Final;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractEndPortalRenderer.class)
 public class MixinTheEndPortalRenderer {
-	@Shadow
-	@Final
-	private static Map<Direction, List<Vector3fc>> FACES;
 	@Unique
 	private static final float RED = 0.075f;
 
@@ -42,24 +38,34 @@ public class MixinTheEndPortalRenderer {
 	@Unique
 	private static final float BLUE = 0.2f;
 
-	@ModifyArg(method = "submitCube", index = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitCustomGeometry(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/SubmitNodeCollector$CustomGeometryRenderer;)V"))
-	private static RenderType iris$renderType(RenderType par2) {
+	@Shadow
+	protected float getOffsetUp() {
+		return 0.75F;
+	}
+
+	@Shadow
+	protected float getOffsetDown() {
+		return 0.375F;
+	}
+
+	@Inject(method = "renderType", at = @At("HEAD"), cancellable = true)
+	private static void iris$renderType(CallbackInfoReturnable<RenderType> cir) {
 		if (Iris.getCurrentPack().isPresent()) {
-			return (RenderTypes.entitySolid(TheEndPortalRenderer.END_PORTAL_LOCATION));
+			cir.setReturnValue(RenderTypes.entitySolid(TheEndPortalRenderer.END_PORTAL_LOCATION));
 		}
-		return par2;
 	}
 
 	@Inject(method = {
-		"lambda$submitCube$0"
+		"method_73539",
+		"lambda$submit$0"
 	}, at = @At("HEAD"), cancellable = true, require = 1)
-	private static <T extends TheEndPortalBlockEntity> void iris$onRender(Collection<Direction> facesToShow, PoseStack.Pose pose, VertexConsumer buffer, CallbackInfo ci) {
+	public <T extends TheEndPortalBlockEntity> void iris$onRender(EndPortalRenderState entity, PoseStack.Pose pose, VertexConsumer vertexConsumer, CallbackInfo ci) {
 		if (Iris.getCurrentPack().isEmpty()) {
 			return;
 		}
 
 		int overlay = OverlayTexture.NO_OVERLAY;
-		int light = LightCoordsUtil.FULL_BRIGHT;
+		int light = LightTexture.FULL_BRIGHT;
 
 		ci.cancel();
 
@@ -68,34 +74,44 @@ public class MixinTheEndPortalRenderer {
 		// animation with a period of 100 seconds.
 		// note that texture coordinates are wrapping, not clamping.
 		float progress = (SystemTimeUniforms.TIMER.getFrameTimeCounter() * 0.01f) % 1f;
+		float topHeight = getOffsetUp();
+		float bottomHeight = getOffsetDown();
 
-		for (Direction direction : facesToShow) {
-			float nx = direction.getStepX();
-			float ny = direction.getStepY();
-			float nz = direction.getStepZ();
+		quad(entity, vertexConsumer, pose, normal, Direction.UP, progress, overlay, light,
+			0.0f, topHeight, 1.0f,
+			1.0f, topHeight, 1.0f,
+			1.0f, topHeight, 0.0f,
+			0.0f, topHeight, 0.0f);
 
-			List<Vector3fc> vertices = FACES.get(direction);
+		quad(entity, vertexConsumer, pose, normal, Direction.DOWN, progress, overlay, light,
+			0.0f, bottomHeight, 1.0f,
+			0.0f, bottomHeight, 0.0f,
+			1.0f, bottomHeight, 0.0f,
+			1.0f, bottomHeight, 1.0f);
 
-			Vector3fc vertex0 = vertices.get(0);
-			buffer.addVertex(pose, vertex0.x(), vertex0.y(), vertex0.z()).setColor(RED, GREEN, BLUE, 1.0f)
-				.setUv(0.0F + progress, 0.0F + progress).setOverlay(overlay).setLight(light)
-				.setNormal(pose, nx, ny, nz);
+		quad(entity, vertexConsumer, pose, normal, Direction.NORTH, progress, overlay, light,
+			0.0f, topHeight, 0.0f,
+			1.0f, topHeight, 0.0f,
+			1.0f, bottomHeight, 0.0f,
+			0.0f, bottomHeight, 0.0f);
 
-			Vector3fc vertex1 = vertices.get(1);
-			buffer.addVertex(pose, vertex1.x(), vertex1.y(), vertex1.z()).setColor(RED, GREEN, BLUE, 1.0f)
-				.setUv(0.0F + progress, 0.2F + progress).setOverlay(overlay).setLight(light)
-				.setNormal(pose, nx, ny, nz);
+		quad(entity, vertexConsumer, pose, normal, Direction.WEST, progress, overlay, light,
+			0.0f, topHeight, 1.0f,
+			0.0f, topHeight, 0.0f,
+			0.0f, bottomHeight, 0.0f,
+			0.0f, bottomHeight, 1.0f);
 
-			Vector3fc vertex2 = vertices.get(2);
-			buffer.addVertex(pose, vertex2.x(), vertex2.y(), vertex2.z()).setColor(RED, GREEN, BLUE, 1.0f)
-				.setUv(0.2F + progress, 0.2F + progress).setOverlay(overlay).setLight(light)
-				.setNormal(pose, nx, ny, nz);
+		quad(entity, vertexConsumer, pose, normal, Direction.SOUTH, progress, overlay, light,
+			0.0f, topHeight, 1.0f,
+			0.0f, bottomHeight, 1.0f,
+			1.0f, bottomHeight, 1.0f,
+			1.0f, topHeight, 1.0f);
 
-			Vector3fc vertex3 = vertices.get(3);
-			buffer.addVertex(pose, vertex3.x(), vertex3.y(), vertex3.z()).setColor(RED, GREEN, BLUE, 1.0f)
-				.setUv(0.2F + progress, 0.0F + progress).setOverlay(overlay).setLight(light)
-				.setNormal(pose, nx, ny, nz);
-		}
+		quad(entity, vertexConsumer, pose, normal, Direction.EAST, progress, overlay, light,
+			1.0f, topHeight, 1.0f,
+			1.0f, bottomHeight, 1.0f,
+			1.0f, bottomHeight, 0.0f,
+			1.0f, topHeight, 0.0f);
 	}
 
 	@Unique

@@ -8,7 +8,6 @@ import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer;
 import net.caffeinemc.mods.sodium.client.render.chunk.ChunkRenderMatrices;
 import net.caffeinemc.mods.sodium.client.util.SodiumChunkSection;
 import net.caffeinemc.mods.sodium.client.world.LevelRendererExtension;
@@ -18,7 +17,6 @@ import net.irisshaders.iris.gl.GLDebug;
 import net.irisshaders.iris.gl.IrisRenderSystem;
 import net.irisshaders.iris.gui.option.IrisVideoSettings;
 import net.irisshaders.iris.mixin.LevelRendererAccessor;
-import net.irisshaders.iris.mixinterface.ShadowRenderListAccess;
 import net.irisshaders.iris.pipeline.IrisRenderingPipeline;
 import net.irisshaders.iris.pipeline.WorldRenderingPhase;
 import net.irisshaders.iris.shaderpack.programs.ProgramSource;
@@ -42,8 +40,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.state.level.LevelRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.OutlineBufferSource;
@@ -80,13 +78,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class ShadowRenderer {
-	public static int RESOLUTION;
 	public static boolean ACTIVE = false;
 	public static List<BlockEntity> visibleBlockEntities;
 	public static int renderDistance;
 	public static Matrix4f MODELVIEW;
 	public static Matrix4f PROJECTION;
-
 	public static Frustum FRUSTUM;
 	private final float halfPlaneLength;
 	private final float nearPlane, farPlane;
@@ -179,7 +175,7 @@ public class ShadowRenderer {
 
 		levelRenderState = new LevelRenderState();
 		submitNodeStorage = new SubmitNodeStorage();
-		featureRenderDispatcher = new FeatureRenderDispatcher(submitNodeStorage, Minecraft.getInstance().getModelManager(), buffers.bufferSource(), Minecraft.getInstance().getAtlasManager(), outlineBuffers, buffers.crumblingBufferSource(), Minecraft.getInstance().font, Minecraft.getInstance().gameRenderer.getGameRenderState());
+		featureRenderDispatcher = new FeatureRenderDispatcher(submitNodeStorage, Minecraft.getInstance().getBlockRenderer(), buffers.bufferSource(), Minecraft.getInstance().getAtlasManager(), outlineBuffers, buffers.crumblingBufferSource(), Minecraft.getInstance().font);
 	}
 
 	public static PoseStack createShadowModelView(float sunPathRotation, float intervalSize, float nearPlane, float farPlane) {
@@ -387,14 +383,18 @@ public class ShadowRenderer {
 		}
 
 		GpuSampler theSampler = RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, true);
-		playerCamera.extractRenderState(levelRenderState.cameraRenderState, CapturedRenderingState.INSTANCE.getTickDelta());
+		levelRenderState.cameraRenderState.blockPos = renderState.blockPos;
+		levelRenderState.cameraRenderState.pos = renderState.pos;
+		levelRenderState.cameraRenderState.orientation = renderState.orientation;
+		levelRenderState.cameraRenderState.entityPos = renderState.entityPos;
+		levelRenderState.cameraRenderState.initialized = renderState.initialized;
+
 		Minecraft client = Minecraft.getInstance();
 
 		ProfilerFiller profiler = Profiler.get();
 
 		profiler.popPush("shadows");
 		ACTIVE = true;
-		RESOLUTION = resolution;
 
 		renderDistance = (int) ((halfPlaneLength * renderDistanceMultiplier) / 16);
 
@@ -415,7 +415,6 @@ public class ShadowRenderer {
 		// Create our camera
 		PoseStack modelView = createShadowModelView(this.sunPathRotation, this.intervalSize, nearPlane, farPlane);
 		MODELVIEW = new Matrix4f(modelView.last().pose());
-		levelRenderState.cameraRenderState.viewRotationMatrix = MODELVIEW;
 
 		RenderSystem.getModelViewStack().pushMatrix();
 		RenderSystem.getModelViewStack().set(MODELVIEW);
@@ -428,7 +427,6 @@ public class ShadowRenderer {
 		} else {
 			shadowProjection = ShadowMatrices.createOrthoMatrix(halfPlaneLength, Mth.equal(nearPlane, -1.0f) ? -DHCompat.getRenderDistance() * 16 : nearPlane, Mth.equal(farPlane, -1.0f) ? DHCompat.getRenderDistance() * 16 : farPlane);
 		}
-		levelRenderState.cameraRenderState.projectionMatrix = shadowProjection;
 
 		IrisRenderSystem.setShadowProjection(shadowProjection);
 
@@ -472,10 +470,7 @@ public class ShadowRenderer {
 		// TODO: Only schedule a terrain update if the sun / moon is moving, or the shadow map camera moved.
 		// We have to ensure that we don't regenerate clouds every frame, since that's what needsUpdate ends up doing.
 		// This took up to 10% of the frame time before we applied this fix! That's really bad!
-		SodiumWorldRenderer sodiumWorldRenderer = ((LevelRendererExtension) levelRenderer).sodium$getWorldRenderer();
-		if (sodiumWorldRenderer instanceof ShadowRenderListAccess shadowRenderListAccess) {
-			shadowRenderListAccess.iris$beginShadowRenderListScope();
-		}
+
 		// TODO IMS 24w35a determine clouds
 		((LevelRenderer) levelRenderer).needsUpdate();
 
@@ -510,14 +505,6 @@ public class ShadowRenderer {
 			sections.renderGroup(ChunkSectionLayerGroup.OPAQUE, theSampler);
 			pipeline.setPhase(WorldRenderingPhase.NONE);
 		}
-
-		if (!ShadowRenderCallbacks.isEmpty()) {
-			profiler.popPush("iris_shadow_callbacks");
-			pipeline.setPhase(WorldRenderingPhase.TERRAIN_CUTOUT);
-			ShadowRenderCallbacks.invoke(MODELVIEW, PROJECTION, cameraX, cameraY, cameraZ, CapturedRenderingState.INSTANCE.getTickDelta());
-			pipeline.setPhase(WorldRenderingPhase.NONE);
-		}
-
 		pipeline.setPhase(WorldRenderingPhase.ENTITIES);
 
 		// Reset our viewport in case Sodium overrode it
@@ -620,10 +607,6 @@ public class ShadowRenderer {
 
 		if (levelRenderer instanceof CullingDataCache) {
 			((CullingDataCache) levelRenderer).restoreState();
-		}
-
-		if (sodiumWorldRenderer instanceof ShadowRenderListAccess shadowRenderListAccess) {
-			shadowRenderListAccess.iris$endShadowRenderListScope();
 		}
 
 		pipeline.removePhaseIfNeeded();

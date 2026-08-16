@@ -5,8 +5,6 @@ import net.irisshaders.iris.Iris;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.irisshaders.iris.api.v0.IrisApiConfig;
 import net.irisshaders.iris.api.v0.IrisProgram;
-import net.irisshaders.iris.api.v0.IrisShadowProgram;
-import net.irisshaders.iris.api.v0.IrisShadowRenderCallback;
 import net.irisshaders.iris.api.v0.IrisTextVertexSink;
 import net.irisshaders.iris.gui.screen.ShaderPackScreen;
 import net.irisshaders.iris.pipeline.IrisPipelines;
@@ -14,7 +12,6 @@ import net.irisshaders.iris.pipeline.VanillaRenderingPipeline;
 import net.irisshaders.iris.pipeline.WorldRenderingPipeline;
 import net.irisshaders.iris.pipeline.programs.ShaderKey;
 import net.irisshaders.iris.shaderpack.loading.ProgramId;
-import net.irisshaders.iris.shadows.ShadowRenderCallbacks;
 import net.irisshaders.iris.shadows.ShadowRenderingState;
 import net.irisshaders.iris.vertices.IrisTextVertexSinkImpl;
 import net.minecraft.client.gui.screens.Screen;
@@ -28,7 +25,7 @@ public class IrisApiV0Impl implements IrisApi {
 
 	@Override
 	public int getMinorApiRevision() {
-		return 4;
+		return 3;
 	}
 
 	@Override
@@ -81,15 +78,5 @@ public class IrisApiV0Impl implements IrisApi {
 	@Override
 	public void assignPipeline(RenderPipeline pipeline, IrisProgram program) {
 		IrisPipelines.assignPipeline(pipeline, ShaderKey.findBestMatch(pipeline, ProgramId.fromAPI(program)));
-	}
-
-	@Override
-	public void assignPipelineShadow(RenderPipeline pipeline, IrisShadowProgram program) {
-		IrisPipelines.assignPipelineShadow(pipeline, ShaderKey.findBestMatch(pipeline, ProgramId.fromAPI(program)));
-	}
-
-	@Override
-	public void registerShadowRenderCallback(IrisShadowRenderCallback callback) {
-		ShadowRenderCallbacks.register(callback);
 	}
 }
