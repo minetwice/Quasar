@@ -8,6 +8,11 @@ pluginManagement {
             name = "NeoForge"
             url = uri("https://maven.neoforged.net/releases/") 
         }
+        maven {
+            name = "Fabric Snapshot"
+            url = uri("https://maven.fabricmc.net/snapshots")
+        }
+        mavenCentral()
         gradlePluginPortal()
     }
 }

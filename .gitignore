@@ -2,7 +2,11 @@
 # Gradle
 .gradle/
 build/
-!gradle/wrapper/gradle-wrapper.properties
+target/
+
+# Dependencies
+.libs/
+lib/
 
 # Logs
 *.log
@@ -15,11 +19,48 @@ build/
 # IDE
 .idea/
 .vscode/
+*.swp
+*.swo
 
-# Dependencies
-node_modules/
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Python (if applicable)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
 venv/
 .venv/
-__pycache__/
-*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage*
+.nox/
+.mypy_cache/
+.pytest_cache/
+.hypothesis/
+
+# Node (if applicable)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+node_modules/
+jspm_packages/
+
+# Temporary files
+*.tmp
+*.temp
+*~
 ```
