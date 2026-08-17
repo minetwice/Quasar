@@ -231,7 +231,10 @@ public class ShaderPack {
 				if (SystemUtils.IS_OS_MAC) {
 					component = component.append(Component.translatable("iris.unsupported.pack.macos"));
 				}
-				Minecraft.getInstance().setScreen(new FeatureMissingErrorScreen(Minecraft.getInstance().screen, Component.translatable("iris.unsupported.pack"), component));
+				List<String> reports = new ArrayList<>();
+				reports.add("[Quasar] Shader pack loaded with adapted/fallback passes.");
+				reports.add("Details: " + component.getString());
+				Minecraft.getInstance().setScreen(new net.quasar.mobile.gui.QuasarCompatScreen(Minecraft.getInstance().screen, reports));
 			}
 			IrisApi.getInstance().getConfig().setShadersEnabledAndApply(false);
 		}

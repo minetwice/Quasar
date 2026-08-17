@@ -108,6 +108,23 @@ public enum InternalTextureFormat {
 	}
 
 	public int getGlFormat() {
+		if (net.quasar.mobile.QuasarContext.getInstance().isGLES()) {
+			net.quasar.mobile.QuasarCapabilities caps = net.quasar.mobile.QuasarCapabilities.getInstance();
+			switch (this) {
+				case RGBA32F:
+				case RGB32F:
+					return caps.canRenderFloat16() ? GL30C.GL_RGBA16F : GL11C.GL_RGBA8;
+				case R32F:
+					return caps.canRenderFloat16() ? GL30C.GL_R16F : GL30C.GL_R8;
+				case RG32F:
+					return caps.canRenderFloat16() ? GL30C.GL_RG16F : GL30C.GL_RG8;
+				case RGBA16F:
+				case RGB16F:
+					return caps.canRenderFloat16() ? glFormat : GL11C.GL_RGBA8;
+				default:
+					break;
+			}
+		}
 		return glFormat;
 	}
 

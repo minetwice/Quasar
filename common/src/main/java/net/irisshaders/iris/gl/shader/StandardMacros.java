@@ -49,8 +49,13 @@ public class StandardMacros {
 		define(standardDefines, "MC_VERSION", getMcVersion());
 		define(standardDefines, "MC_MIPMAP_LEVEL", String.valueOf(Minecraft.getInstance().options.mipmapLevels().get()));
 		define(standardDefines, "IRIS_VERSION", getFormattedIrisVersion());
-		define(standardDefines, "MC_GL_VERSION", getGlVersion(GL20C.GL_VERSION));
-		define(standardDefines, "MC_GLSL_VERSION", getGlVersion(GL20C.GL_SHADING_LANGUAGE_VERSION));
+		if (net.quasar.mobile.QuasarContext.getInstance().isGLES()) {
+			define(standardDefines, "MC_GL_VERSION", "460");
+			define(standardDefines, "MC_GLSL_VERSION", "460");
+		} else {
+			define(standardDefines, "MC_GL_VERSION", getGlVersion(GL20C.GL_VERSION));
+			define(standardDefines, "MC_GLSL_VERSION", getGlVersion(GL20C.GL_SHADING_LANGUAGE_VERSION));
+		}
 		define(standardDefines, getOsString());
 		define(standardDefines, getVendor());
 		define(standardDefines, getRenderer());
@@ -95,6 +100,9 @@ public class StandardMacros {
 
 		for (String glExtension : getGlExtensions()) {
 			define(standardDefines, glExtension);
+		}
+		for (String qExt : net.quasar.mobile.QuasarCapabilities.getInstance().getExtensions()) {
+			define(standardDefines, "MC_" + qExt);
 		}
 
 		define(standardDefines, "MC_NORMAL_MAP");

@@ -72,6 +72,10 @@ public final class ComputeProgram extends GlResource {
 	}
 
 	public void dispatch(float width, float height) {
+		if (net.quasar.mobile.QuasarContext.getInstance().isGLES() && !net.quasar.mobile.QuasarContext.getInstance().isAtLeastES(3, 1)) {
+			return;
+		}
+
 		if (!Iris.getPipelineManager().getPipeline().map(WorldRenderingPipeline::allowConcurrentCompute).orElse(false)) {
 			IrisRenderSystem.memoryBarrier(GL43C.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL43C.GL_TEXTURE_FETCH_BARRIER_BIT | GL43C.GL_SHADER_STORAGE_BARRIER_BIT);
 		}
