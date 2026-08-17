@@ -1,7 +1,6 @@
 package net.quasar.mobile;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,23 +18,12 @@ public class QuasarContext {
 	private final boolean isGLES;
 	private final int esMajor;
 	private final int esMinor;
+	private final boolean initialized;
 
 	private QuasarContext() {
-		String version = "";
-		String renderer = "";
-		String vendor = "";
-
-		try {
-			version = GL11.glGetString(GL11.GL_VERSION);
-			renderer = GL11.glGetString(GL11.GL_RENDERER);
-			vendor = GL11.glGetString(GL11.GL_VENDOR);
-		} catch (Throwable t) {
-			LOGGER.warn("[Quasar] Failed to query GL strings directly: " + t.getMessage());
-		}
-
-		this.glVersion = version != null ? version : "Unknown";
-		this.glRenderer = renderer != null ? renderer : "Unknown";
-		this.glVendor = vendor != null ? vendor : "Unknown";
+		this.glVersion = probeGlVersion();
+		this.glRenderer = probeGlRenderer();
+		this.glVendor = probeGlVendor();
 
 		this.isGLES = this.glVersion.startsWith("OpenGL ES") || this.glVersion.contains("GLES") || Boolean.getBoolean("quasar.force_gles");
 
@@ -60,11 +48,44 @@ public class QuasarContext {
 		this.esMajor = maj;
 		this.esMinor = min;
 
-		LOGGER.info("[Quasar] Context: isGLES=" + this.isGLES + " (ES " + esMajor + "." + esMinor + ") | Renderer=" + this.glRenderer + " | Vendor=" + this.glVendor + " | Version=" + this.glVersion);
+		if (!"Unknown".equals(this.glVersion)) {
+			this.initialized = true;
+			LOGGER.info("[Quasar] Context: isGLES=" + this.isGLES + " (ES " + esMajor + "." + esMinor + ") | Renderer=" + this.glRenderer + " | Vendor=" + this.glVendor + " | Version=" + this.glVersion);
+		} else {
+			this.initialized = false;
+		}
+	}
+
+	private static String probeGlVersion() {
+		try {
+			String v = GL11.glGetString(GL11.GL_VERSION);
+			return v != null ? v : "Unknown";
+		} catch (Throwable t) {
+			LOGGER.warn("[Quasar] GL context not ready at init, deferring context detection: " + t.getMessage());
+			return "Unknown";
+		}
+	}
+
+	private static String probeGlRenderer() {
+		try {
+			String r = GL11.glGetString(GL11.GL_RENDERER);
+			return r != null ? r : "Unknown";
+		} catch (Throwable ignored) {
+			return "Unknown";
+		}
+	}
+
+	private static String probeGlVendor() {
+		try {
+			String v = GL11.glGetString(GL11.GL_VENDOR);
+			return v != null ? v : "Unknown";
+		} catch (Throwable ignored) {
+			return "Unknown";
+		}
 	}
 
 	public static synchronized QuasarContext getInstance() {
-		if (instance == null) {
+		if (instance == null || !instance.initialized) {
 			instance = new QuasarContext();
 		}
 		return instance;

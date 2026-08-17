@@ -30,7 +30,10 @@ public class IrisFabricHelpers implements IrisPlatformHelpers {
 
 	@Override
 	public String getVersion() {
-		return FabricLoader.getInstance().getModContainer("iris").get().getMetadata().getVersion().getFriendlyString();
+		return FabricLoader.getInstance().getModContainer("quasar")
+				.or(() -> FabricLoader.getInstance().getModContainer("iris"))
+				.map(container -> container.getMetadata().getVersion().getFriendlyString())
+				.orElse("1.0.0-quasar");
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.ServiceLoader;
 
 public interface IrisPlatformHelpers {
-	IrisPlatformHelpers INSTANCE = ServiceLoader.load(IrisPlatformHelpers.class).findFirst().get();
+	IrisPlatformHelpers INSTANCE = ServiceLoader.load(IrisPlatformHelpers.class).findFirst().orElseThrow(() -> new IllegalStateException("IrisPlatformHelpers implementation service not found"));
 
 	static IrisPlatformHelpers getInstance() {
 		return INSTANCE;
