@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinDimensionSpecialEffects {
 	@Inject(method = "renderSunriseAndSunset", at = @At("HEAD"), cancellable = true)
 	private void iris$getSunriseColor(PoseStack poseStack, float f, int i, CallbackInfo ci) {
-		boolean blockSky = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getLevelRenderState().cameraRenderState.entityRenderState.doesMobEffectBlockSky;
+		boolean blockSky = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).invokeDoesMobEffectBlockSky(Minecraft.getInstance().gameRenderer.getMainCamera());
 
 		if (blockSky) {
 			ci.cancel();

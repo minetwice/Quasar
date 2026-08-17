@@ -133,7 +133,6 @@ public final class CommonUniforms {
 		MatrixUniforms.addMatrixUniforms(uniforms, directives);
 		IdMapUniforms.addIdMapUniforms(updateNotifier, uniforms, idMap, directives.isOldHandLight());
 		CommonUniforms.generalCommonUniforms(uniforms, updateNotifier, directives);
-		IrisInternalUniforms.addOtherUniforms(uniforms, updateNotifier, directives);
 	}
 
 	public static void generalCommonUniforms(UniformHolder uniforms, FrameUpdateNotifier updateNotifier, PackDirectives directives) {
@@ -183,7 +182,10 @@ public final class CommonUniforms {
 			.uniform3d(PER_FRAME, "skyColor", CommonUniforms::getSkyColor)
 			.uniform1f(PER_FRAME, "dhFarPlane", DHCompat::getFarPlane)
 			.uniform1f(PER_FRAME, "dhNearPlane", DHCompat::getNearPlane)
-			.uniform1i(PER_FRAME, "dhRenderDistance", DHCompat::getRenderDistance);
+			.uniform1i(PER_FRAME, "dhRenderDistance", DHCompat::getRenderDistance)
+			.uniform1f(PER_FRAME, "quasar_RenderScale", net.quasar.mobile.QuasarProfiler::getRenderScale)
+			.uniform1i(ONCE, "quasar_ESVersion", () -> net.quasar.mobile.QuasarContext.getEsMajor() * 10 + net.quasar.mobile.QuasarContext.getEsMinor())
+			.uniform1i(ONCE, "quasar_DeviceTier", net.quasar.mobile.QuasarProfiler::getDeviceTier);
 	}
 
 	private static boolean isOnGround() {

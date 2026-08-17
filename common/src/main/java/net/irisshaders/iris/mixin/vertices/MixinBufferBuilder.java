@@ -13,7 +13,6 @@ import net.irisshaders.iris.vertices.BufferBuilderPolygonView;
 import net.irisshaders.iris.vertices.ExtendedDataHelper;
 import net.irisshaders.iris.vertices.ImmediateState;
 import net.irisshaders.iris.vertices.IrisVertexFormats;
-import net.irisshaders.iris.vertices.MemoryAccess;
 import net.irisshaders.iris.vertices.MojangBufferAccessor;
 import net.irisshaders.iris.vertices.NormI8;
 import net.irisshaders.iris.vertices.NormalHelper;
@@ -104,7 +103,7 @@ public abstract class MixinBufferBuilder implements VertexConsumer, BlockSensiti
 			iris$isTerrain = true;
 			injectNormalAndUV1 = false;
 			return IrisVertexFormats.TERRAIN;
-		} else if (format == DefaultVertexFormat.ENTITY || format == IrisVertexFormats.ENTITY) {
+		} else if (format == DefaultVertexFormat.NEW_ENTITY || format == IrisVertexFormats.ENTITY) {
 			extending = true;
 			iris$isTerrain = false;
 			injectNormalAndUV1 = false;
@@ -128,22 +127,22 @@ public abstract class MixinBufferBuilder implements VertexConsumer, BlockSensiti
 	private void injectMidBlock(float x, float y, float z, CallbackInfoReturnable<VertexConsumer> cir) {
 		if ((this.elementsToFill & IrisVertexFormats.MID_BLOCK_ELEMENT.mask()) != 0) {
 			long midBlockOffset = this.beginElement(IrisVertexFormats.MID_BLOCK_ELEMENT);
-			MemoryAccess.setInt(midBlockOffset, ExtendedDataHelper.computeMidBlock(x, y, z, currentLocalPosX, currentLocalPosY, currentLocalPosZ));
+			MemoryUtil.memPutInt(midBlockOffset, ExtendedDataHelper.computeMidBlock(x, y, z, currentLocalPosX, currentLocalPosY, currentLocalPosZ));
 			byte currentBlockEmission = -1;
-			MemoryAccess.setByte(midBlockOffset + 3, currentBlockEmission);
+			MemoryUtil.memPutByte(midBlockOffset + 3, currentBlockEmission);
 		}
 
 		if ((this.elementsToFill & IrisVertexFormats.ENTITY_ELEMENT.mask()) != 0) {
 			long offset = this.beginElement(IrisVertexFormats.ENTITY_ELEMENT);
 			// ENTITY_ELEMENT
-			MemoryAccess.setShort(offset, (short) currentBlock);
-			MemoryAccess.setShort(offset + 2, currentRenderType);
+			MemoryUtil.memPutShort(offset, (short) currentBlock);
+			MemoryUtil.memPutShort(offset + 2, currentRenderType);
 		} else if ((this.elementsToFill & IrisVertexFormats.ENTITY_ID_ELEMENT.mask()) != 0) {
 			long offset = this.beginElement(IrisVertexFormats.ENTITY_ID_ELEMENT);
 			// ENTITY_ID_ELEMENT
-			MemoryAccess.setShort(offset, (short) CapturedRenderingState.INSTANCE.getCurrentRenderedEntity());
-			MemoryAccess.setShort(offset + 2, (short) CapturedRenderingState.INSTANCE.getCurrentRenderedBlockEntity());
-			MemoryAccess.setShort(offset + 4, (short) CapturedRenderingState.INSTANCE.getCurrentRenderedItem());
+			MemoryUtil.memPutShort(offset, (short) CapturedRenderingState.INSTANCE.getCurrentRenderedEntity());
+			MemoryUtil.memPutShort(offset + 2, (short) CapturedRenderingState.INSTANCE.getCurrentRenderedBlockEntity());
+			MemoryUtil.memPutShort(offset + 4, (short) CapturedRenderingState.INSTANCE.getCurrentRenderedItem());
 		}
 	}
 
@@ -230,13 +229,13 @@ public abstract class MixinBufferBuilder implements VertexConsumer, BlockSensiti
 
 			for (int vertex = 0; vertex < vertexAmount; vertex++) {
 				long newPointer = ((MojangBufferAccessor) buffer).getPointer() + vertexOffsets[vertex];
-				int vertexNormal = MemoryAccess.getInt(newPointer + normalOffset); // retrieve per-vertex normal
+				int vertexNormal = MemoryUtil.memGetInt(newPointer + normalOffset); // retrieve per-vertex normal
 
 				int tangent = NormalHelper.computeTangentSmooth(NormI8.unpackX(vertexNormal), NormI8.unpackY(vertexNormal), NormI8.unpackZ(vertexNormal), polygon);
 
-				MemoryAccess.setFloat(newPointer + midTexOffset, midU);
-				MemoryAccess.setFloat(newPointer + midTexOffset + 4, midV);
-				MemoryAccess.setInt(newPointer + tangentOffset, tangent);
+				MemoryUtil.memPutFloat(newPointer + midTexOffset, midU);
+				MemoryUtil.memPutFloat(newPointer + midTexOffset + 4, midV);
+				MemoryUtil.memPutInt(newPointer + tangentOffset, tangent);
 			}
 		} else {
 			// TODO: Temporary fix for EMI item batching
@@ -251,12 +250,12 @@ public abstract class MixinBufferBuilder implements VertexConsumer, BlockSensiti
 			for (int vertex = 0; vertex < vertexAmount; vertex++) {
 				long newPointer = ((MojangBufferAccessor) buffer).getPointer() + vertexOffsets[vertex];
 
-				MemoryAccess.setFloat(newPointer + midTexOffset, midU);
-				MemoryAccess.setFloat(newPointer + midTexOffset + 4, midV);
+				MemoryUtil.memPutFloat(newPointer + midTexOffset, midU);
+				MemoryUtil.memPutFloat(newPointer + midTexOffset + 4, midV);
 				if (recalculateNormal) {
-					MemoryAccess.setInt(newPointer + normalOffset, packedNormal);
+					MemoryUtil.memPutInt(newPointer + normalOffset, packedNormal);
 				}
-				MemoryAccess.setInt(newPointer + tangentOffset, tangent);
+				MemoryUtil.memPutInt(newPointer + tangentOffset, tangent);
 			}
 		}
 

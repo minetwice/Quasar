@@ -1,17 +1,14 @@
 plugins {
     id("java")
     id("idea")
-    id("net.fabricmc.fabric-loom") version("1.15.4")
+    id("fabric-loom") version "1.14.4"
     id("com.github.gmazzo.buildconfig") version "5.3.5"
 }
 
 repositories {
     mavenLocal()
     maven("https://maven.parchmentmc.org/")
-    maven {
-        name = "caffeinemcRepositoryReleases"
-        url = uri("https://maven.caffeinemc.net/releases")
-    }
+
     exclusiveContent {
         forRepository {
             maven {
@@ -26,6 +23,7 @@ repositories {
 }
 
 val MINECRAFT_VERSION: String by rootProject.extra
+val MOJANG_MINECRAFT_VERSION: String by rootProject.extra
 val PARCHMENT_VERSION: String? by rootProject.extra
 val FABRIC_LOADER_VERSION: String by rootProject.extra
 val SODIUM_DEPENDENCY_FABRIC: Any by rootProject.extra
@@ -50,18 +48,23 @@ buildConfig {
 }
 
 dependencies {
-    minecraft(group = "com.mojang", name = "minecraft", version = MINECRAFT_VERSION)
+    minecraft(group = "com.mojang", name = "minecraft", version = MOJANG_MINECRAFT_VERSION)
 
-    implementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
+    mappings(loom.layered() {
+        officialMojangMappings()
+        if (PARCHMENT_VERSION != null) {
+            parchment("org.parchmentmc.data:parchment-${MOJANG_MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
+        }
+    })
 
-    compileOnly(fabricApi.module("fabric-resource-loader-v1", FABRIC_API_VERSION))
-    compileOnly(fabricApi.module("fabric-block-getter-api-v2", FABRIC_API_VERSION))
-    compileOnly(fabricApi.module("fabric-renderer-api-v1", FABRIC_API_VERSION))
+    modImplementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
 
-    implementation(SODIUM_DEPENDENCY_FABRIC)
-    compileOnly("org.antlr:antlr4-runtime:4.13.1")
-    compileOnly("io.github.douira:glsl-transformer:3.0.0-pre3")
-    compileOnly("org.anarres:jcpp:1.4.14")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-renderer-api-v1:3.2.9+1172e897d7")
+
+    modImplementation(SODIUM_DEPENDENCY_FABRIC)
+    modCompileOnly("org.antlr:antlr4-runtime:4.13.1")
+    modCompileOnly("io.github.douira:glsl-transformer:3.0.0-pre3")
+    modCompileOnly("org.anarres:jcpp:1.4.14")
 
     compileOnly(files(rootDir.resolve("DHApi.jar")))
 }
@@ -70,36 +73,6 @@ afterEvaluate {
     tasks.withType<JavaCompile> {
         options.compilerArgs.add("-Xmaxerrs")
         options.compilerArgs.add("2000")
-    }
-}
-
-val vendoredJar by tasks.registering(Jar::class) {
-    from(sourceSets.getByName("vendored").output)
-    archiveClassifier.set("vendored")
-}
-
-val apiJar by tasks.registering(Jar::class) {
-    from(sourceSets.getByName("api").output)
-    archiveClassifier.set("api")
-}
-
-val headersJar by tasks.registering(Jar::class) {
-    from(sourceSets.getByName("headers").output)
-    archiveClassifier.set("headers")
-}
-
-configurations {
-    register("vendoredJar") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
-    }
-    register("apiJar") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
-    }
-    register("headersJar") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
     }
 }
 
@@ -145,12 +118,6 @@ sourceSets {
     }
 }
 
-artifacts {
-    add("vendoredJar", vendoredJar)
-    add("apiJar", apiJar)
-    add("headersJar", headersJar)
-}
-
 loom {
     mixin {
         defaultRefmapName = "iris.refmap.json"
@@ -174,8 +141,8 @@ tasks {
         }
     }
     getByName<JavaCompile>("compileDesktopJava") {
-        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
-        targetCompatibility = JavaVersion.VERSION_1_8.toString()
+        sourceCompatibility = JavaVersion.VERSION_21.toString()
+        targetCompatibility = JavaVersion.VERSION_21.toString()
     }
 
     jar {

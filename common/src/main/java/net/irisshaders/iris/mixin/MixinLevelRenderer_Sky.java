@@ -1,7 +1,6 @@
 package net.irisshaders.iris.mixin;
 
 import net.irisshaders.iris.Iris;
-import net.irisshaders.iris.MojLambdas;
 import net.irisshaders.iris.NeoLambdas;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -43,7 +42,7 @@ public class MixinLevelRenderer_Sky {
 	 * <p>When updating Sodium to new releases of the game, please check for new
 	 * ways the fog can be reduced in {@link FogRenderer#setupFog}.</p>
 	 */
-	@Inject(method = {MojLambdas.RENDER_SKY, NeoLambdas.NEO_RENDER_SKY }, require = 1, at = @At("HEAD"), cancellable = true)
+	@Inject(method = { "method_62215", NeoLambdas.NEO_RENDER_SKY }, require = 1, at = @At("HEAD"), cancellable = true)
 	private static void preRenderSky(CallbackInfo ci) {
 		if (Iris.getCurrentPack().isEmpty()) {
 			Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
@@ -51,7 +50,7 @@ public class MixinLevelRenderer_Sky {
 			Entity cameraEntity = camera.entity();
 
 			boolean isSubmersed = camera.getFluidInCamera() != FogType.NONE;
-			boolean blockSky = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getLevelRenderState().cameraRenderState.entityRenderState.doesMobEffectBlockSky;
+			boolean blockSky = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).invokeDoesMobEffectBlockSky(camera);
 			boolean useThickFog = Minecraft.getInstance().gui.getBossOverlay().shouldCreateWorldFog();
 
 			if (isSubmersed || blockSky || useThickFog) {

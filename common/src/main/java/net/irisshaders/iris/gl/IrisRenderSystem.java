@@ -2,7 +2,6 @@ package net.irisshaders.iris.gl;
 
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.opengl.GlDevice;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexSorting;
@@ -12,10 +11,9 @@ import net.irisshaders.iris.Iris;
 import net.irisshaders.iris.gl.sampler.SamplerLimits;
 import net.irisshaders.iris.gl.texture.TextureType;
 import net.irisshaders.iris.mixin.GlStateManagerAccessor;
-import net.irisshaders.iris.mixin.GpuDeviceAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.ProjectionMatrixBuffer;
+import net.minecraft.client.renderer.PerspectiveProjectionMatrixBuffer;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3i;
@@ -44,7 +42,7 @@ import java.nio.IntBuffer;
 public class IrisRenderSystem {
 	private static final int[] emptyArray = new int[SamplerLimits.get().getMaxTextureUnits()];
 	private static GpuBufferSlice backupProjection;
-	private static ProjectionMatrixBuffer perspectiveProjectionMatrixBuffer;
+	private static PerspectiveProjectionMatrixBuffer perspectiveProjectionMatrixBuffer;
 	private static ProjectionType backupProjectionType;
 	private static DSAAccess dsaState;
 	private static boolean hasMultibind;
@@ -68,10 +66,10 @@ public class IrisRenderSystem {
 		}
 
 		hasMultibind = GL.getCapabilities().OpenGL45 || GL.getCapabilities().GL_ARB_multi_bind;
-		perspectiveProjectionMatrixBuffer = new ProjectionMatrixBuffer("Iris shadow map projection");
+		perspectiveProjectionMatrixBuffer = new PerspectiveProjectionMatrixBuffer("Iris shadow map projection");
 
-		supportsCompute = GL.getCapabilities().glDispatchCompute != MemoryUtil.NULL;
-		supportsTesselation = GL.getCapabilities().GL_ARB_tessellation_shader || GL.getCapabilities().OpenGL40;
+		supportsCompute = GL.getCapabilities().glDispatchCompute != MemoryUtil.NULL || (net.quasar.mobile.QuasarContext.isGLES() && (net.quasar.mobile.QuasarContext.getEsMajor() > 3 || (net.quasar.mobile.QuasarContext.getEsMajor() == 3 && net.quasar.mobile.QuasarContext.getEsMinor() >= 1)));
+		supportsTesselation = GL.getCapabilities().GL_ARB_tessellation_shader || GL.getCapabilities().OpenGL40 || (net.quasar.mobile.QuasarContext.isGLES() && (net.quasar.mobile.QuasarContext.getEsMajor() > 3 || (net.quasar.mobile.QuasarContext.getEsMajor() == 3 && net.quasar.mobile.QuasarContext.getEsMinor() >= 2)));
 
 		samplers = new int[SamplerLimits.get().getMaxTextureUnits()];
 	}
@@ -559,11 +557,7 @@ public class IrisRenderSystem {
 		return GL46C.glGetAttribLocation(handle, irisNormal);
 	}
 
-	public static GlDevice getGlDevice() {
-		return (GlDevice) ((GpuDeviceAccessor) RenderSystem.getDevice()).getBackend();
-	}
-
-    public interface DSAAccess {
+	public interface DSAAccess {
 		void generateMipmaps(int texture, int target);
 
 		void texParameteri(int texture, int target, int pname, int param);

@@ -65,7 +65,7 @@ public class SodiumPrograms {
 			}
 
 			AlphaTest alphaTest = getAlphaTest(pass, source);
-			Map<PatchShaderType, String> transformed = transformShaders(source, alphaTest, programSet, pass == Pass.SHADOW || pass == Pass.SHADOW_CUTOUT || pass == Pass.SHADOW_TRANS);
+			Map<PatchShaderType, String> transformed = transformShaders(source, alphaTest, programSet);
 			GlProgram<ChunkShaderInterface> shader = createShader(pipeline, pass, source, alphaTest, customUniforms, flipState, createGlShaders(pass.name().toLowerCase(Locale.ROOT), transformed));
 			shaders.put(pass, shader);
 		}
@@ -78,7 +78,7 @@ public class SodiumPrograms {
 			pass == Pass.TRANSLUCENT ? AlphaTests.NON_ZERO_ALPHA : (pass == Pass.TERRAIN_CUTOUT || pass == Pass.SHADOW_CUTOUT ? AlphaTests.HALF_ALPHA : AlphaTest.ALWAYS));
 	}
 
-	private Map<PatchShaderType, String> transformShaders(ProgramSource source, AlphaTest alphaTest, ProgramSet programSet, boolean shadow) {
+	private Map<PatchShaderType, String> transformShaders(ProgramSource source, AlphaTest alphaTest, ProgramSet programSet) {
 		Map<PatchShaderType, String> transformed = TransformPatcher.patchSodium(
 			source.getName(),
 			source.getVertexSource().orElse(null),
@@ -87,7 +87,7 @@ public class SodiumPrograms {
 			source.getTessEvalSource().orElse(null),
 			source.getFragmentSource().orElse(null),
 			alphaTest,
-			programSet.getPackDirectives().getTextureMap(), shadow);
+			programSet.getPackDirectives().getTextureMap());
 
 		ShaderPrinter.printProgram("sodium_" + source.getName()).addSources(transformed).print();
 
