@@ -9,8 +9,8 @@ pluginManagement {
             url = uri("https://maven.neoforged.net/releases/") 
         }
         maven {
-            name = "Fabric Snapshot"
-            url = uri("https://maven.fabricmc.net/snapshots")
+            name = "JitPack"
+            url = uri("https://jitpack.io")
         }
         mavenCentral()
         gradlePluginPortal()
