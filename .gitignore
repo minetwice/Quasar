@@ -26,41 +26,46 @@ lib/
 .DS_Store
 Thumbs.db
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
 # Python (if applicable)
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
-env/
 venv/
 .venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage*
-.nox/
-.mypy_cache/
-.pytest_cache/
-.hypothesis/
+.env
 
-# Node (if applicable)
+# Node.js (if applicable)
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.npm
-.yarn-integrity
-node_modules/
-jspm_packages/
 
-# Temporary files
+# Compiled files
+*.class
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.out
+
+# Archives
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.gz
+*.rar
+*.7z
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Testing
 *.tmp
 *.temp
-*~
 ```
