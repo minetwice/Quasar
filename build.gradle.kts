@@ -9,8 +9,8 @@ val NEOFORGE_VERSION by extra { "21.11.5-beta" }
 val FABRIC_LOADER_VERSION by extra { "0.18.1" }
 val FABRIC_API_VERSION by extra { "0.140.2+1.21.11" }
 
-val SODIUM_DEPENDENCY_FABRIC by extra { files(rootDir.resolve("custom_sodium/sodium-fabric-0.8.7+mc1.21.11.jar")) }
-val SODIUM_DEPENDENCY_NEO by extra { files(rootDir.resolve("custom_sodium/net.caffeinemc.sodium-neoforge-0.8.6+mc1.21.11-mod.jar")) }
+val SODIUM_DEPENDENCY_FABRIC by extra { "net.caffeinemc:sodium-fabric:0.8.7+mc1.21.11" }
+val SODIUM_DEPENDENCY_NEO by extra { "net.caffeinemc:sodium-neoforge-mod:0.8.6+mc1.21.11" }
 
 // This value can be set to null to disable Parchment.
 // TODO: Re-add Parchment
@@ -22,6 +22,12 @@ val MOD_VERSION by extra { "1.10.6" }
 allprojects {
     apply(plugin = "java")
     apply(plugin = "maven-publish")
+
+    repositories {
+        mavenCentral()
+        maven { url = uri("https://maven.caffeinemc.net/releases") }
+        maven { url = uri("https://api.modrinth.com/maven") }
+    }
 }
 
 tasks.withType<JavaCompile> {

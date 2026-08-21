@@ -11,6 +11,9 @@ import net.irisshaders.iris.gl.texture.DepthBufferFormat;
 import net.irisshaders.iris.pbr.TextureInfoCache;
 import org.lwjgl.opengl.GL30C;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GlFramebuffer extends GlResource {
 	private final Int2IntMap attachments;
 	private final int maxDrawBuffers;
@@ -66,15 +69,26 @@ public class GlFramebuffer extends GlResource {
 			throw new IllegalArgumentException("Cannot write to more than " + maxDrawBuffers + " draw buffers on this GPU");
 		}
 
-		for (int buffer : buffers) {
-			if (buffer >= maxColorAttachments) {
-				throw new IllegalArgumentException("Only " + maxColorAttachments + " color attachments are supported on this GPU, but an attempt was made to write to a color attachment with index " + buffer);
-			}
+		int allowedBuffers = net.quasar.mobile.QuasarCapabilities.getInstance().getMaxDrawBuffers();
+		List<Integer> validList = new ArrayList<>();
 
-			glBuffers[index++] = GL30C.GL_COLOR_ATTACHMENT0 + buffer;
+		for (int buffer : buffers) {
+			if (buffer < maxColorAttachments && validList.size() < allowedBuffers) {
+				validList.add(buffer);
+			}
+		}
+
+		if (validList.isEmpty()) {
+			validList.add(0);
+		}
+
+		glBuffers = new int[validList.size()];
+		for (int i = 0; i < validList.size(); i++) {
+			glBuffers[i] = GL30C.GL_COLOR_ATTACHMENT0 + validList.get(i);
 		}
 
 		IrisRenderSystem.drawBuffers(getGlId(), glBuffers);
+		verifyFboStatus();
 	}
 
 	public void readBuffer(int buffer) {
@@ -109,6 +123,32 @@ public class GlFramebuffer extends GlResource {
 		bind();
 
 		return IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
+	}
+
+	public void verifyFboStatus() {
+		bind();
+		int status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
+		int attempts = 0;
+		while (status != GL30C.GL_FRAMEBUFFER_COMPLETE && attempts < 4 && net.quasar.mobile.QuasarContext.getInstance().isGLES()) {
+			attempts++;
+			org.slf4j.LoggerFactory.getLogger("Quasar").warn("[Quasar] FBO downgrade attempt " + attempts + ": status=0x" + Integer.toHexString(status));
+			for (Int2IntMap.Entry entry : attachments.int2IntEntrySet()) {
+				int colorIdx = entry.getIntKey();
+				int oldTex = entry.getIntValue();
+				int newTex = com.mojang.blaze3d.opengl.GlStateManager._genTexture();
+				GlStateManager._bindTexture(newTex);
+				GlStateManager._texImage2D(GL30C.GL_TEXTURE_2D, 0, GL30C.GL_RGBA8, 512, 512, 0, GL30C.GL_RGBA, GL30C.GL_UNSIGNED_BYTE, null);
+				IrisRenderSystem.framebufferTexture2D(getGlId(), GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorIdx, GL30C.GL_TEXTURE_2D, newTex, 0);
+				attachments.put(colorIdx, newTex);
+				GlStateManager._deleteTexture(oldTex);
+			}
+			status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
+		}
+		if (status == GL30C.GL_FRAMEBUFFER_COMPLETE && net.quasar.mobile.QuasarContext.getInstance().isGLES()) {
+			org.slf4j.LoggerFactory.getLogger("Quasar").info("[Quasar] FBO reached COMPLETE status");
+		} else if (status != GL30C.GL_FRAMEBUFFER_COMPLETE) {
+			org.slf4j.LoggerFactory.getLogger("Quasar").error("[Quasar] Framebuffer incomplete after retries: status=0x" + Integer.toHexString(status));
+		}
 	}
 
 	public int getId() {

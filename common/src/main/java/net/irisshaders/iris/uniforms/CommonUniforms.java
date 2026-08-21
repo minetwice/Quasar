@@ -114,6 +114,10 @@ public final class CommonUniforms {
 		}, StateUpdateNotifiers.blendFuncNotifier);
 
 		uniforms.uniform1i("renderStage", () -> GbufferPrograms.getCurrentPhase().ordinal(), StateUpdateNotifiers.phaseChangeNotifier);
+
+		uniforms.uniform1f("quasar_RenderScale", () -> 1.0f, listener -> {});
+		uniforms.uniform1i("quasar_ESVersion", () -> net.quasar.mobile.QuasarContext.getInstance().isGLES() ? (net.quasar.mobile.QuasarContext.getInstance().getEsMajor() * 10 + net.quasar.mobile.QuasarContext.getInstance().getEsMinor()) : 0, listener -> {});
+		uniforms.uniform1i("quasar_DeviceTier", () -> net.quasar.mobile.QuasarProfiler.getInstance().getDeviceTier(), listener -> {});
 	}
 
 	public static void addCommonUniforms(DynamicUniformHolder uniforms, IdMap idMap, PackDirectives directives, FrameUpdateNotifier updateNotifier, FogMode fogMode) {

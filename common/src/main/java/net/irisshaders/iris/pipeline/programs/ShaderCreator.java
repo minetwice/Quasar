@@ -209,6 +209,8 @@ public class ShaderCreator {
 	private static int createShader(String name, ShaderType shaderType, String source) {
 		if (source == null) return -1;
 
+		source = net.quasar.mobile.QuasarTranspiler.transpile(source, shaderType, name);
+
 		int shader = GlStateManager.glCreateShader(shaderType.id);
 		GlStateManager.glShaderSource(shader, source);
 		GlStateManager.glCompileShader(shader);

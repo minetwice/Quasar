@@ -28,6 +28,7 @@ public class GlShader extends GlResource {
 	}
 
 	private static int createShader(ShaderType type, String name, String src) {
+		src = net.quasar.mobile.QuasarTranspiler.transpile(src, type, name);
 		int handle = GlStateManager.glCreateShader(type.id);
 		ShaderWorkarounds.safeShaderSource(handle, src);
 		GlStateManager.glCompileShader(handle);
