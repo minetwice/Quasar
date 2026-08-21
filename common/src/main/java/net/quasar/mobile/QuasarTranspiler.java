@@ -66,9 +66,13 @@ public class QuasarTranspiler {
 
 			// R1 & R6: remove existing #version and forbidden extensions
 			if (trimmed.startsWith("#version")) continue;
+			if (trimmed.contains("GL_NV_shader_noperspective_interpolation")) continue;
 			if (trimmed.startsWith("#extension GL_ARB_") || trimmed.startsWith("#extension GL_NV_") || trimmed.startsWith("#extension GL_EXT_gpu_shader4")) {
 				continue;
 			}
+
+			// Strip noperspective qualifier
+			line = line.replaceAll("\\bnoperspective\\b", "smooth");
 
 			// Parse DRAWBUFFERS comment
 			Matcher dbMatcher = DRAWBUFFERS_PATTERN.matcher(line);

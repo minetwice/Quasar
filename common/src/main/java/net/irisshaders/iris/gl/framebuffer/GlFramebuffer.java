@@ -128,8 +128,26 @@ public class GlFramebuffer extends GlResource {
 	public void verifyFboStatus() {
 		bind();
 		int status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
-		if (status != GL30C.GL_FRAMEBUFFER_COMPLETE) {
-			org.slf4j.LoggerFactory.getLogger("Quasar").warn("[Quasar] Framebuffer incomplete (0x" + Integer.toHexString(status) + "). Attempting downgrade retry.");
+		int attempts = 0;
+		while (status != GL30C.GL_FRAMEBUFFER_COMPLETE && attempts < 4 && net.quasar.mobile.QuasarContext.getInstance().isGLES()) {
+			attempts++;
+			org.slf4j.LoggerFactory.getLogger("Quasar").warn("[Quasar] FBO downgrade attempt " + attempts + ": status=0x" + Integer.toHexString(status));
+			for (Int2IntMap.Entry entry : attachments.int2IntEntrySet()) {
+				int colorIdx = entry.getIntKey();
+				int oldTex = entry.getIntValue();
+				int newTex = com.mojang.blaze3d.opengl.GlStateManager._genTexture();
+				GlStateManager._bindTexture(newTex);
+				GlStateManager._texImage2D(GL30C.GL_TEXTURE_2D, 0, GL30C.GL_RGBA8, 512, 512, 0, GL30C.GL_RGBA, GL30C.GL_UNSIGNED_BYTE, null);
+				IrisRenderSystem.framebufferTexture2D(getGlId(), GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorIdx, GL30C.GL_TEXTURE_2D, newTex, 0);
+				attachments.put(colorIdx, newTex);
+				GlStateManager._deleteTexture(oldTex);
+			}
+			status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
+		}
+		if (status == GL30C.GL_FRAMEBUFFER_COMPLETE && net.quasar.mobile.QuasarContext.getInstance().isGLES()) {
+			org.slf4j.LoggerFactory.getLogger("Quasar").info("[Quasar] FBO reached COMPLETE status");
+		} else if (status != GL30C.GL_FRAMEBUFFER_COMPLETE) {
+			org.slf4j.LoggerFactory.getLogger("Quasar").error("[Quasar] Framebuffer incomplete after retries: status=0x" + Integer.toHexString(status));
 		}
 	}
 
