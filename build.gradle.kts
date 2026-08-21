@@ -3,13 +3,13 @@ plugins {
     id("net.fabricmc.fabric-loom") version("1.15.4") apply(false)
 }
 
-val MINECRAFT_VERSION by extra { "26.1.2" }
-val NEOFORGE_VERSION by extra { "26.1.2.10-beta" }
-val FABRIC_LOADER_VERSION by extra { "0.19.3" }
-val FABRIC_API_VERSION by extra { "0.154.2+26.1.2" }
+val MINECRAFT_VERSION by extra { "1.21.11" }
+val NEOFORGE_VERSION by extra { "21.11.5-beta" }
+val FABRIC_LOADER_VERSION by extra { "0.18.1" }
+val FABRIC_API_VERSION by extra { "0.140.2+1.21.11" }
 
-val SODIUM_DEPENDENCY_FABRIC by extra { "net.caffeinemc:sodium-fabric:0.9.1+mc26.1.2" }
-val SODIUM_DEPENDENCY_NEO by extra { "net.caffeinemc:sodium-neoforge-mod:0.9.1+mc26.1.2" }
+val SODIUM_DEPENDENCY_FABRIC by extra { "maven.modrinth:sodium:mc1.21.11-0.8.14-beta.2-fabric" }
+val SODIUM_DEPENDENCY_NEO by extra { "maven.modrinth:sodium:mc1.21.11-0.8.14-beta.2-neoforge" }
 
 // This value can be set to null to disable Parchment.
 val PARCHMENT_VERSION by extra { null }
@@ -32,7 +32,7 @@ tasks.jar {
 subprojects {
     apply(plugin = "maven-publish")
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
     fun createVersionString(): String {
         val builder = StringBuilder()
@@ -71,7 +71,7 @@ subprojects {
 
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.release.set(25)
+        options.release.set(21)
     }
 
     // Disables Gradle's custom module metadata from being published to maven.

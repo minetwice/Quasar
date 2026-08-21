@@ -93,6 +93,10 @@ public class JavaTranspiler {
 		StringBuilder sb = new StringBuilder();
 		for (String line : lines) {
 			String trimmed = line.trim();
+			if (trimmed.contains("GL_NV_shader_noperspective_interpolation")) {
+				sb.append("// removed: ").append(line).append("\n");
+				continue;
+			}
 			if (trimmed.startsWith("#extension")) {
 				if (trimmed.contains("GL_ARB_") || trimmed.contains("GL_EXT_gpu_shader4") || trimmed.contains("GL_NV_")) {
 					if (!trimmed.contains("GL_OES_standard_derivatives") && !trimmed.contains("GL_EXT_shader_texture_lod")) {
@@ -105,6 +109,9 @@ public class JavaTranspiler {
 		}
 		code.setLength(0);
 		code.append(sb);
+
+		// Rule 5.1: Replace reserved 'noperspective' token with 'smooth'
+		replaceAllWord(code, "noperspective", "smooth");
 	}
 
 	private static void mapVersion(StringBuilder code) {

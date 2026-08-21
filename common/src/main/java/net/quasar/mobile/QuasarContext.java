@@ -36,7 +36,26 @@ public class QuasarContext {
 			Iris.logger.warn("Failed to read GL strings during QuasarContext init", t);
 		}
 
-		isGLES = glVersion.startsWith("OpenGL ES");
+		String matchedRule = "none";
+		String vLower = glVersion.toLowerCase();
+		String rLower = glRenderer.toLowerCase();
+
+		if (glVersion.startsWith("OpenGL ES")) {
+			isGLES = true;
+			matchedRule = "GL_VERSION starts with OpenGL ES";
+		} else if (containsAny(vLower, "openltw", "ltw", "fogltlogles", "mali", "adreno", "powervr", "tegra", "virgl", "zink", "llvmpipe") ||
+		           containsAny(rLower, "openltw", "ltw", "fogltlogles", "mali", "adreno", "powervr", "tegra", "virgl", "zink", "llvmpipe")) {
+			isGLES = true;
+			matchedRule = "Mobile/Translation GPU driver match in version or renderer string";
+		} else {
+			String osName = System.getProperty("os.name", "").toLowerCase();
+			String runtimeName = System.getProperty("java.runtime.name", "").toLowerCase();
+			if (osName.contains("android") || (osName.contains("linux") && runtimeName.contains("android"))) {
+				isGLES = true;
+				matchedRule = "Android OS / Runtime detected";
+			}
+		}
+
 		if (isGLES) {
 			parseESVersion(glVersion);
 		}
@@ -44,7 +63,16 @@ public class QuasarContext {
 
 		initialized = true;
 
-		Iris.logger.info("Context: " + glVersion + " | " + glRenderer + " | GLES=" + isGLES + " ES=" + esMajor + "." + esMinor);
+		Iris.logger.info("Context: isGLES=" + isGLES + " (ES " + esMajor + "." + esMinor + ") | Renderer=" + glRenderer + " | Vendor=" + glVendor + " | matchedRule=" + matchedRule);
+	}
+
+	private static boolean containsAny(String input, String... targets) {
+		for (String target : targets) {
+			if (input.contains(target)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static void parseESVersion(String versionString) {
@@ -63,11 +91,11 @@ public class QuasarContext {
 				}
 			} else {
 				esMajor = 3;
-				esMinor = 0;
+				esMinor = 2;
 			}
 		} catch (Exception e) {
 			esMajor = 3;
-			esMinor = 0;
+			esMinor = 2;
 		}
 	}
 

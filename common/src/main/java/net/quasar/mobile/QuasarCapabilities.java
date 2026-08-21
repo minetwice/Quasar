@@ -107,7 +107,8 @@ public class QuasarCapabilities {
 
 		initialized = true;
 
-		Iris.logger.info("CAPS: MRT=" + maxDrawBuffers +
+		Iris.logger.info("CAPS: GLES=" + QuasarContext.isGLES() +
+			" drawBuffers=" + maxDrawBuffers +
 			" float16=" + (canRenderFloat16 ? "y" : "n") +
 			" float32=" + (canRenderFloat32 ? "y" : "n") +
 			" compute=" + (es31OrHigher ? "y" : "n") +

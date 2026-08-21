@@ -116,6 +116,8 @@ public enum InternalTextureFormat {
 		boolean f32 = net.quasar.mobile.QuasarCapabilities.canRenderFloat32();
 
 		switch (this) {
+			case RGB9_E5:
+				return f16 ? RGBA16F : RGBA8;
 			case RGBA32F:
 			case RGB32F:
 				if (f32) return this;
