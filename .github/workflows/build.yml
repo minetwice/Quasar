@@ -23,7 +23,7 @@ jobs:
           gradle-version: current
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew :fabric:build
 
       - name: Upload built JAR
         uses: actions/upload-artifact@v4
