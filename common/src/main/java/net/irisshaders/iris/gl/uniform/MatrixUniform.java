@@ -1,12 +1,10 @@
 package net.irisshaders.iris.gl.uniform;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.irisshaders.iris.gl.state.ValueUpdateNotifier;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL46C;
 
 import java.nio.FloatBuffer;
 import java.util.function.Supplier;
@@ -48,7 +46,7 @@ public class MatrixUniform extends Uniform {
 			cachedValue.get(buffer);
 			buffer.rewind();
 
-			GL46C.glUniformMatrix4fv(location, false, buffer);
+			RenderSystem.glUniformMatrix4(location, false, buffer);
 		}
 	}
 }

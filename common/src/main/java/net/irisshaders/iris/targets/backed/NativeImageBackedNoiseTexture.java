@@ -1,9 +1,6 @@
 package net.irisshaders.iris.targets.backed;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
-import net.irisshaders.iris.gl.sampler.GlSampler;
 import net.irisshaders.iris.gl.texture.TextureAccess;
 import net.irisshaders.iris.gl.texture.TextureType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -14,7 +11,7 @@ import java.util.function.IntSupplier;
 
 public class NativeImageBackedNoiseTexture extends DynamicTexture implements TextureAccess {
 	public NativeImageBackedNoiseTexture(int size) {
-		super(() -> "Noise / " + size, create(size));
+		super(create(size));
 	}
 
 	private static NativeImage create(int size) {
@@ -25,7 +22,7 @@ public class NativeImageBackedNoiseTexture extends DynamicTexture implements Tex
 			for (int y = 0; y < size; y++) {
 				int color = random.nextInt() | (255 << 24);
 
-				image.setPixel(x, y, color);
+				image.setPixelRGBA(x, y, color);
 			}
 		}
 
@@ -36,7 +33,8 @@ public class NativeImageBackedNoiseTexture extends DynamicTexture implements Tex
 	public void upload() {
 		NativeImage image = Objects.requireNonNull(getPixels());
 
-		RenderSystem.getDevice().createCommandEncoder().writeToTexture(this.texture, image);
+		bind();
+		image.upload(0, 0, 0, 0, 0, image.getWidth(), image.getHeight(), true, false, false, false);
 	}
 
 	@Override
@@ -46,11 +44,6 @@ public class NativeImageBackedNoiseTexture extends DynamicTexture implements Tex
 
 	@Override
 	public IntSupplier getTextureId() {
-		return this.getTexture()::iris$getGlId;
-	}
-
-	@Override
-	public GlSampler getSampling() {
-		return GlSampler.LINEAR_REPEAT;
+		return this::getId;
 	}
 }

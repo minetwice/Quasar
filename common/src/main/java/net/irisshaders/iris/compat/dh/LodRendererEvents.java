@@ -1,7 +1,5 @@
 package net.irisshaders.iris.compat.dh;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.seibel.distanthorizons.api.DhApi;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiFogDrawMode;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiRenderPass;
@@ -31,7 +29,6 @@ import net.irisshaders.iris.pipeline.WorldRenderingPipeline;
 import net.irisshaders.iris.shadows.ShadowRenderer;
 import net.irisshaders.iris.shadows.ShadowRenderingState;
 import net.irisshaders.iris.uniforms.CapturedRenderingState;
-import net.minecraft.client.Minecraft;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.lwjgl.opengl.GL43C;
@@ -200,7 +197,7 @@ public class LodRendererEvents {
 					if (ShadowRenderingState.areShadowsCurrentlyBeingRendered()) {
 						event.cancelEvent();
 					} else if (getInstance().shouldOverride) {
-						GlStateManager._clear(GL43C.GL_DEPTH_BUFFER_BIT);
+						GL43C.glClear(GL43C.GL_DEPTH_BUFFER_BIT);
 						event.cancelEvent();
 					}
 				}

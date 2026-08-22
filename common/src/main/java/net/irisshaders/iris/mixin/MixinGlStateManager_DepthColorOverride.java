@@ -1,13 +1,10 @@
 package net.irisshaders.iris.mixin;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.irisshaders.iris.gl.blending.DepthColorStorage;
 import net.irisshaders.iris.vertices.ImmediateState;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL43C;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -16,9 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GlStateManager.class)
 public class MixinGlStateManager_DepthColorOverride {
 	@Inject(method = "_colorMask", at = @At("HEAD"), cancellable = true, remap = false)
-	private static void iris$colorMaskLock(int writeMask, CallbackInfo ci) {
+	private static void iris$colorMaskLock(boolean red, boolean green, boolean blue, boolean alpha, CallbackInfo ci) {
 		if (DepthColorStorage.isDepthColorLocked()) {
-			DepthColorStorage.deferColorMask(writeMask);
+			DepthColorStorage.deferColorMask(red, green, blue, alpha);
 			ci.cancel();
 		}
 	}

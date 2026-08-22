@@ -1,19 +1,9 @@
 package net.irisshaders.iris.mixin;
 
-import com.mojang.blaze3d.opengl.GlConst;
-import com.mojang.blaze3d.opengl.GlDevice;
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
 import net.irisshaders.iris.gl.GLDebug;
-import net.irisshaders.iris.gl.IrisRenderSystem;
-import net.irisshaders.iris.mixinterface.RenderTargetInterface;
 import net.irisshaders.iris.targets.Blaze3dRenderTargetExt;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL43C;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -26,16 +16,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * to the shader framebuffers. See DeferredWorldRenderingPipeline and RenderTargets.
  */
 @Mixin(RenderTarget.class)
-public class MixinRenderTarget implements Blaze3dRenderTargetExt, RenderTargetInterface {
+public class MixinRenderTarget implements Blaze3dRenderTargetExt {
 	@Shadow
-	@Final
-	public boolean useDepth;
+	protected int depthBufferId;
+
 	@Shadow
-	@Nullable
-	protected GpuTexture colorTexture;
+	protected int colorTextureId;
 	@Shadow
-	@Nullable
-	protected GpuTexture depthTexture;
+	public int frameBufferId;
 	@Unique
 	private int iris$depthBufferVersion;
 	@Unique
@@ -47,6 +35,13 @@ public class MixinRenderTarget implements Blaze3dRenderTargetExt, RenderTargetIn
 		iris$colorBufferVersion++;
 	}
 
+	@Inject(method = "createBuffers", at = @At(value = "RETURN"))
+	private void nameDepthBuffer(int i, int j, boolean bl, CallbackInfo ci) {
+		GLDebug.nameObject(GL43C.GL_TEXTURE, this.depthBufferId, "Main depth texture");
+		GLDebug.nameObject(GL43C.GL_TEXTURE, this.colorTextureId, "Main color texture");
+		GLDebug.nameObject(GL43C.GL_FRAMEBUFFER, this.frameBufferId, "Main framebuffer");
+	}
+
 	@Override
 	public int iris$getDepthBufferVersion() {
 		return iris$depthBufferVersion;
@@ -55,10 +50,5 @@ public class MixinRenderTarget implements Blaze3dRenderTargetExt, RenderTargetIn
 	@Override
 	public int iris$getColorBufferVersion() {
 		return iris$colorBufferVersion;
-	}
-
-	@Override
-	public void iris$bindFramebuffer() {
-		GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, ((GlTexture) this.colorTexture).getFbo((IrisRenderSystem.getGlDevice()).directStateAccess(), this.depthTexture));
 	}
 }

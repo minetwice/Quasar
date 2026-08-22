@@ -5,7 +5,7 @@ import net.minecraft.client.renderer.texture.SpriteContents.AnimatedTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(SpriteContents.AnimationState.class)
+@Mixin(SpriteContents.Ticker.class)
 public interface SpriteContentsTickerAccessor {
 	@Accessor("frame")
 	int getFrame();

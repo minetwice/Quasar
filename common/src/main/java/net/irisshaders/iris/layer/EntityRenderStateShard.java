@@ -1,18 +1,11 @@
 package net.irisshaders.iris.layer;
 
-public final class EntityRenderStateShard implements RenderingWrapper {
+import net.minecraft.client.renderer.RenderStateShard;
+
+public final class EntityRenderStateShard extends RenderStateShard {
 	public static final EntityRenderStateShard INSTANCE = new EntityRenderStateShard();
 
 	private EntityRenderStateShard() {
-	}
-
-	@Override
-	public void setup() {
-		GbufferPrograms.beginEntities();
-	}
-
-	@Override
-	public void clear() {
-		GbufferPrograms.endEntities();
+		super("iris:is_entity", GbufferPrograms::beginEntities, GbufferPrograms::endEntities);
 	}
 }

@@ -19,14 +19,7 @@ Iris is a modern shaders mod for Minecraft intended to be compatible with existi
 [[dependencies.iris]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.3,)"
-ordering = "NONE"
-side = "CLIENT"
-
-[[dependencies.iris]]
-modId = "neoforge"
-type = "required"
-versionRange = "[21.3.9-beta,)"
+versionRange = "[1.21,1.21.1)"
 ordering = "NONE"
 side = "CLIENT"
 
@@ -34,7 +27,13 @@ side = "CLIENT"
 config = "mixins.iris.json"
 
 [[mixins]]
+config = "mixins.iris.fantastic.json"
+
+[[mixins]]
 config = "mixins.iris.vertexformat.json"
+
+[[mixins]]
+config = "iris-batched-entity-rendering.mixins.json"
 
 [[mixins]]
 config = "mixins.iris.compat.sodium.json"
@@ -48,21 +47,13 @@ config = "mixins.iris.forge.json"
 [mods."sodium:options"]
 "mixin.features.render.world.sky" = false
 
-[modproperties.iris]
-"sodium:config_api_user" = "net.irisshaders.iris.compat.sodium.config.IrisConfig"
-
 [[dependencies.iris]]
 modId = "embeddium"
 type = "incompatible"
-reason = "Iris and Embeddium cannot be used together. Please use Sodium 0.6 instead."
+reason = "Iris and Embeddium cannot be used together. Please use Sodium 0.8 instead."
 versionRange = "[0.0.1,)"
 ordering = "NONE"
 side = "CLIENT"
 
-[[dependencies.iris]]
-modId = "sodium"
-type = "required"
-reason = "Iris requires Sodium. Please install Sodium 0.6 for Iris to work."
-versionRange = "[0.6,)"
-ordering = "NONE"
-side = "CLIENT"
+[modproperties.iris]
+"sodium:config_api_user" = "net.irisshaders.iris.compat.sodium.config.IrisConfig"

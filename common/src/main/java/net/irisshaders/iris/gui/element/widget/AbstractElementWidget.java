@@ -4,21 +4,19 @@ import net.irisshaders.iris.gui.NavigationController;
 import net.irisshaders.iris.gui.screen.ShaderPackScreen;
 import net.irisshaders.iris.shaderpack.option.menu.OptionMenuElement;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractElementWidget<T extends OptionMenuElement> implements GuiEventListener, NarratableEntry {
 	public static final AbstractElementWidget<OptionMenuElement> EMPTY = new AbstractElementWidget<>(null) {
 		@Override
-		public void render(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float tickDelta, boolean hovered) {
+		public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float tickDelta, boolean hovered) {
 		}
 
 		@Override
@@ -42,20 +40,20 @@ public abstract class AbstractElementWidget<T extends OptionMenuElement> impleme
 	public void init(ShaderPackScreen screen, NavigationController navigation) {
 	}
 
-	public abstract void render(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float tickDelta, boolean hovered);
+	public abstract void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float tickDelta, boolean hovered);
 
 	@Override
-	public boolean mouseClicked(MouseButtonEvent event, boolean bl2) {
+	public boolean mouseClicked(double mx, double my, int button) {
 		return false;
 	}
 
 	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
+	public boolean mouseReleased(double mx, double my, int button) {
 		return false;
 	}
 
 	@Override
-	public boolean keyPressed(KeyEvent event) {
+	public boolean keyPressed(int keycode, int scancode, int modifiers) {
 		return false;
 	}
 

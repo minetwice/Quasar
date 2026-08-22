@@ -13,90 +13,88 @@ import java.util.Optional;
 public enum InternalTextureFormat {
 	// Default
 	// TODO: This technically shouldn't be exposed to shaders since it's not in the specification, it's the default anyways
-	RGBA(GL11C.GL_RGBA8, GlVersion.GL_11, PixelFormat.RGBA, ShaderDataType.FLOAT),
+	RGBA(GL11C.GL_RGBA, GlVersion.GL_11, PixelFormat.RGBA),
 	// 8-bit normalized
-	R8(GL30C.GL_R8, GlVersion.GL_30, PixelFormat.RED, ShaderDataType.FLOAT),
-	RG8(GL30C.GL_RG8, GlVersion.GL_30, PixelFormat.RG, ShaderDataType.FLOAT),
-	RGB8(GL11C.GL_RGB8, GlVersion.GL_11, PixelFormat.RGB, ShaderDataType.FLOAT),
-	RGBA8(GL11C.GL_RGBA8, GlVersion.GL_11, PixelFormat.RGBA, ShaderDataType.FLOAT),
+	R8(GL30C.GL_R8, GlVersion.GL_30, PixelFormat.RED),
+	RG8(GL30C.GL_RG8, GlVersion.GL_30, PixelFormat.RG),
+	RGB8(GL11C.GL_RGB8, GlVersion.GL_11, PixelFormat.RGB),
+	RGBA8(GL11C.GL_RGBA8, GlVersion.GL_11, PixelFormat.RGBA),
 	// 8-bit signed normalized
-	R8_SNORM(GL31C.GL_R8_SNORM, GlVersion.GL_31, PixelFormat.RED, ShaderDataType.FLOAT),
-	RG8_SNORM(GL31C.GL_RG8_SNORM, GlVersion.GL_31, PixelFormat.RG, ShaderDataType.FLOAT),
-	RGB8_SNORM(GL31C.GL_RGB8_SNORM, GlVersion.GL_31, PixelFormat.RGB, ShaderDataType.FLOAT),
-	RGBA8_SNORM(GL31C.GL_RGBA8_SNORM, GlVersion.GL_31, PixelFormat.RGBA, ShaderDataType.FLOAT),
+	R8_SNORM(GL31C.GL_R8_SNORM, GlVersion.GL_31, PixelFormat.RED),
+	RG8_SNORM(GL31C.GL_RG8_SNORM, GlVersion.GL_31, PixelFormat.RG),
+	RGB8_SNORM(GL31C.GL_RGB8_SNORM, GlVersion.GL_31, PixelFormat.RGB),
+	RGBA8_SNORM(GL31C.GL_RGBA8_SNORM, GlVersion.GL_31, PixelFormat.RGBA),
 	// 16-bit normalized
-	R16(GL30C.GL_R16, GlVersion.GL_30, PixelFormat.RED, ShaderDataType.FLOAT),
-	RG16(GL30C.GL_RG16, GlVersion.GL_30, PixelFormat.RG, ShaderDataType.FLOAT),
-	RGB16(GL11C.GL_RGB16, GlVersion.GL_11, PixelFormat.RGB, ShaderDataType.FLOAT),
-	RGBA16(GL11C.GL_RGBA16, GlVersion.GL_11, PixelFormat.RGBA, ShaderDataType.FLOAT),
+	R16(GL30C.GL_R16, GlVersion.GL_30, PixelFormat.RED),
+	RG16(GL30C.GL_RG16, GlVersion.GL_30, PixelFormat.RG),
+	RGB16(GL11C.GL_RGB16, GlVersion.GL_11, PixelFormat.RGB),
+	RGBA16(GL11C.GL_RGBA16, GlVersion.GL_11, PixelFormat.RGBA),
 	// 16-bit signed normalized
-	R16_SNORM(GL31C.GL_R16_SNORM, GlVersion.GL_31, PixelFormat.RED, ShaderDataType.FLOAT),
-	RG16_SNORM(GL31C.GL_RG16_SNORM, GlVersion.GL_31, PixelFormat.RG, ShaderDataType.FLOAT),
-	RGB16_SNORM(GL31C.GL_RGB16_SNORM, GlVersion.GL_31, PixelFormat.RGB, ShaderDataType.FLOAT),
-	RGBA16_SNORM(GL31C.GL_RGBA16_SNORM, GlVersion.GL_31, PixelFormat.RGBA, ShaderDataType.FLOAT),
+	R16_SNORM(GL31C.GL_R16_SNORM, GlVersion.GL_31, PixelFormat.RED),
+	RG16_SNORM(GL31C.GL_RG16_SNORM, GlVersion.GL_31, PixelFormat.RG),
+	RGB16_SNORM(GL31C.GL_RGB16_SNORM, GlVersion.GL_31, PixelFormat.RGB),
+	RGBA16_SNORM(GL31C.GL_RGBA16_SNORM, GlVersion.GL_31, PixelFormat.RGBA),
 	// 16-bit float
-	R16F(GL30C.GL_R16F, GlVersion.GL_30, PixelFormat.RED, ShaderDataType.FLOAT),
-	RG16F(GL30C.GL_RG16F, GlVersion.GL_30, PixelFormat.RG, ShaderDataType.FLOAT),
-	RGB16F(GL30C.GL_RGB16F, GlVersion.GL_30, PixelFormat.RGB, ShaderDataType.FLOAT),
-	RGBA16F(GL30C.GL_RGBA16F, GlVersion.GL_30, PixelFormat.RGBA, ShaderDataType.FLOAT),
+	R16F(GL30C.GL_R16F, GlVersion.GL_30, PixelFormat.RED),
+	RG16F(GL30C.GL_RG16F, GlVersion.GL_30, PixelFormat.RG),
+	RGB16F(GL30C.GL_RGB16F, GlVersion.GL_30, PixelFormat.RGB),
+	RGBA16F(GL30C.GL_RGBA16F, GlVersion.GL_30, PixelFormat.RGBA),
 	// 32-bit float
-	R32F(GL30C.GL_R32F, GlVersion.GL_30, PixelFormat.RED, ShaderDataType.FLOAT),
-	RG32F(GL30C.GL_RG32F, GlVersion.GL_30, PixelFormat.RG, ShaderDataType.FLOAT),
-	RGB32F(GL30C.GL_RGB32F, GlVersion.GL_30, PixelFormat.RGB, ShaderDataType.FLOAT),
-	RGBA32F(GL30C.GL_RGBA32F, GlVersion.GL_30, PixelFormat.RGBA, ShaderDataType.FLOAT),
+	R32F(GL30C.GL_R32F, GlVersion.GL_30, PixelFormat.RED),
+	RG32F(GL30C.GL_RG32F, GlVersion.GL_30, PixelFormat.RG),
+	RGB32F(GL30C.GL_RGB32F, GlVersion.GL_30, PixelFormat.RGB),
+	RGBA32F(GL30C.GL_RGBA32F, GlVersion.GL_30, PixelFormat.RGBA),
 	// 8-bit integer
-	R8I(GL30C.GL_R8I, GlVersion.GL_30, PixelFormat.RED_INTEGER, ShaderDataType.INT),
-	RG8I(GL30C.GL_RG8I, GlVersion.GL_30, PixelFormat.RG_INTEGER, ShaderDataType.INT),
-	RGB8I(GL30C.GL_RGB8I, GlVersion.GL_30, PixelFormat.RGB_INTEGER, ShaderDataType.INT),
-	RGBA8I(GL30C.GL_RGBA8I, GlVersion.GL_30, PixelFormat.RGBA_INTEGER, ShaderDataType.INT),
+	R8I(GL30C.GL_R8I, GlVersion.GL_30, PixelFormat.RED_INTEGER),
+	RG8I(GL30C.GL_RG8I, GlVersion.GL_30, PixelFormat.RG_INTEGER),
+	RGB8I(GL30C.GL_RGB8I, GlVersion.GL_30, PixelFormat.RGB_INTEGER),
+	RGBA8I(GL30C.GL_RGBA8I, GlVersion.GL_30, PixelFormat.RGBA_INTEGER),
 	// 8-bit unsigned integer
-	R8UI(GL30C.GL_R8UI, GlVersion.GL_30, PixelFormat.RED_INTEGER, ShaderDataType.UINT),
-	RG8UI(GL30C.GL_RG8UI, GlVersion.GL_30, PixelFormat.RG_INTEGER, ShaderDataType.UINT),
-	RGB8UI(GL30C.GL_RGB8UI, GlVersion.GL_30, PixelFormat.RGB_INTEGER, ShaderDataType.UINT),
-	RGBA8UI(GL30C.GL_RGBA8UI, GlVersion.GL_30, PixelFormat.RGBA_INTEGER, ShaderDataType.UINT),
+	R8UI(GL30C.GL_R8UI, GlVersion.GL_30, PixelFormat.RED_INTEGER),
+	RG8UI(GL30C.GL_RG8UI, GlVersion.GL_30, PixelFormat.RG_INTEGER),
+	RGB8UI(GL30C.GL_RGB8UI, GlVersion.GL_30, PixelFormat.RGB_INTEGER),
+	RGBA8UI(GL30C.GL_RGBA8UI, GlVersion.GL_30, PixelFormat.RGBA_INTEGER),
 	// 16-bit integer
-	R16I(GL30C.GL_R16I, GlVersion.GL_30, PixelFormat.RED_INTEGER, ShaderDataType.INT),
-	RG16I(GL30C.GL_RG16I, GlVersion.GL_30, PixelFormat.RG_INTEGER, ShaderDataType.INT),
-	RGB16I(GL30C.GL_RGB16I, GlVersion.GL_30, PixelFormat.RGB_INTEGER, ShaderDataType.INT),
-	RGBA16I(GL30C.GL_RGBA16I, GlVersion.GL_30, PixelFormat.RGBA_INTEGER, ShaderDataType.INT),
+	R16I(GL30C.GL_R16I, GlVersion.GL_30, PixelFormat.RED_INTEGER),
+	RG16I(GL30C.GL_RG16I, GlVersion.GL_30, PixelFormat.RG_INTEGER),
+	RGB16I(GL30C.GL_RGB16I, GlVersion.GL_30, PixelFormat.RGB_INTEGER),
+	RGBA16I(GL30C.GL_RGBA16I, GlVersion.GL_30, PixelFormat.RGBA_INTEGER),
 	// 16-bit unsigned integer
-	R16UI(GL30C.GL_R16UI, GlVersion.GL_30, PixelFormat.RED_INTEGER, ShaderDataType.UINT),
-	RG16UI(GL30C.GL_RG16UI, GlVersion.GL_30, PixelFormat.RG_INTEGER, ShaderDataType.UINT),
-	RGB16UI(GL30C.GL_RGB16UI, GlVersion.GL_30, PixelFormat.RGB_INTEGER, ShaderDataType.UINT),
-	RGBA16UI(GL30C.GL_RGBA16UI, GlVersion.GL_30, PixelFormat.RGBA_INTEGER, ShaderDataType.UINT),
+	R16UI(GL30C.GL_R16UI, GlVersion.GL_30, PixelFormat.RED_INTEGER),
+	RG16UI(GL30C.GL_RG16UI, GlVersion.GL_30, PixelFormat.RG_INTEGER),
+	RGB16UI(GL30C.GL_RGB16UI, GlVersion.GL_30, PixelFormat.RGB_INTEGER),
+	RGBA16UI(GL30C.GL_RGBA16UI, GlVersion.GL_30, PixelFormat.RGBA_INTEGER),
 	// 32-bit integer
-	R32I(GL30C.GL_R32I, GlVersion.GL_30, PixelFormat.RED_INTEGER, ShaderDataType.INT),
-	RG32I(GL30C.GL_RG32I, GlVersion.GL_30, PixelFormat.RG_INTEGER, ShaderDataType.INT),
-	RGB32I(GL30C.GL_RGB32I, GlVersion.GL_30, PixelFormat.RGB_INTEGER, ShaderDataType.INT),
-	RGBA32I(GL30C.GL_RGBA32I, GlVersion.GL_30, PixelFormat.RGBA_INTEGER, ShaderDataType.INT),
+	R32I(GL30C.GL_R32I, GlVersion.GL_30, PixelFormat.RED_INTEGER),
+	RG32I(GL30C.GL_RG32I, GlVersion.GL_30, PixelFormat.RG_INTEGER),
+	RGB32I(GL30C.GL_RGB32I, GlVersion.GL_30, PixelFormat.RGB_INTEGER),
+	RGBA32I(GL30C.GL_RGBA32I, GlVersion.GL_30, PixelFormat.RGBA_INTEGER),
 	// 32-bit unsigned integer
-	R32UI(GL30C.GL_R32UI, GlVersion.GL_30, PixelFormat.RED_INTEGER, ShaderDataType.UINT),
-	RG32UI(GL30C.GL_RG32UI, GlVersion.GL_30, PixelFormat.RG_INTEGER, ShaderDataType.UINT),
-	RGB32UI(GL30C.GL_RGB32UI, GlVersion.GL_30, PixelFormat.RGB_INTEGER, ShaderDataType.UINT),
-	RGBA32UI(GL30C.GL_RGBA32UI, GlVersion.GL_30, PixelFormat.RGBA_INTEGER, ShaderDataType.UINT),
+	R32UI(GL30C.GL_R32UI, GlVersion.GL_30, PixelFormat.RED_INTEGER),
+	RG32UI(GL30C.GL_RG32UI, GlVersion.GL_30, PixelFormat.RG_INTEGER),
+	RGB32UI(GL30C.GL_RGB32UI, GlVersion.GL_30, PixelFormat.RGB_INTEGER),
+	RGBA32UI(GL30C.GL_RGBA32UI, GlVersion.GL_30, PixelFormat.RGBA_INTEGER),
 	// 2-bit normalized
-	RGBA2(GL11C.GL_RGBA2, GlVersion.GL_11, PixelFormat.RGBA, ShaderDataType.FLOAT),
+	RGBA2(GL11C.GL_RGBA2, GlVersion.GL_11, PixelFormat.RGBA),
 	// 4-bit normalized
-	RGBA4(GL11C.GL_RGBA4, GlVersion.GL_11, PixelFormat.RGBA, ShaderDataType.FLOAT),
+	RGBA4(GL11C.GL_RGBA4, GlVersion.GL_11, PixelFormat.RGBA),
 	// Mixed
-	R3_G3_B2(GL11C.GL_R3_G3_B2, GlVersion.GL_11, PixelFormat.RGB, ShaderDataType.FLOAT),
-	RGB5_A1(GL11C.GL_RGB5_A1, GlVersion.GL_11, PixelFormat.RGBA, ShaderDataType.FLOAT),
-	RGB565(GL41C.GL_RGB565, GlVersion.GL_41, PixelFormat.RGB, ShaderDataType.FLOAT),
-	RGB10_A2(GL11C.GL_RGB10_A2, GlVersion.GL_11, PixelFormat.RGBA, ShaderDataType.FLOAT),
-	RGB10_A2UI(GL33C.GL_RGB10_A2UI, GlVersion.GL_33, PixelFormat.RGBA_INTEGER, ShaderDataType.UINT),
-	R11F_G11F_B10F(GL30C.GL_R11F_G11F_B10F, GlVersion.GL_30, PixelFormat.RGB, ShaderDataType.FLOAT),
-	RGB9_E5(GL30C.GL_RGB9_E5, GlVersion.GL_30, PixelFormat.RGB, ShaderDataType.FLOAT);
+	R3_G3_B2(GL11C.GL_R3_G3_B2, GlVersion.GL_11, PixelFormat.RGB),
+	RGB5_A1(GL11C.GL_RGB5_A1, GlVersion.GL_11, PixelFormat.RGBA),
+	RGB565(GL41C.GL_RGB565, GlVersion.GL_41, PixelFormat.RGB),
+	RGB10_A2(GL11C.GL_RGB10_A2, GlVersion.GL_11, PixelFormat.RGBA),
+	RGB10_A2UI(GL33C.GL_RGB10_A2UI, GlVersion.GL_33, PixelFormat.RGBA_INTEGER),
+	R11F_G11F_B10F(GL30C.GL_R11F_G11F_B10F, GlVersion.GL_30, PixelFormat.RGB),
+	RGB9_E5(GL30C.GL_RGB9_E5, GlVersion.GL_30, PixelFormat.RGB);
 
 	private final int glFormat;
 	private final GlVersion minimumGlVersion;
 	private final PixelFormat expectedPixelFormat;
-	private final ShaderDataType shaderDataType;
 
-	InternalTextureFormat(int glFormat, GlVersion minimumGlVersion, PixelFormat expectedPixelFormat, ShaderDataType shaderDataType) {
+	InternalTextureFormat(int glFormat, GlVersion minimumGlVersion, PixelFormat expectedPixelFormat) {
 		this.glFormat = glFormat;
 		this.minimumGlVersion = minimumGlVersion;
 		this.expectedPixelFormat = expectedPixelFormat;
-		this.shaderDataType = shaderDataType;
 	}
 
 	public static Optional<InternalTextureFormat> fromString(String name) {
@@ -107,37 +105,16 @@ public enum InternalTextureFormat {
 		}
 	}
 
-	public InternalTextureFormat getDowngraded() {
-		if (!net.quasar.mobile.QuasarContext.isGLES()) {
-			return this;
-		}
-
-		boolean f16 = net.quasar.mobile.QuasarCapabilities.canRenderFloat16();
-		boolean f32 = net.quasar.mobile.QuasarCapabilities.canRenderFloat32();
-
-		switch (this) {
-			case RGB9_E5:
-				return f16 ? RGBA16F : RGBA8;
-			case RGBA32F:
-			case RGB32F:
-				if (f32) return this;
-				return f16 ? RGBA16F : RGBA8;
-			case R32F:
-				if (f32) return this;
-				return f16 ? R16F : R8;
-			case RG32F:
-				if (f32) return this;
-				return f16 ? RG16F : RG8;
-			case RGBA16F:
-			case RGB16F:
-				return f16 ? this : RGBA8;
-			default:
-				return this;
-		}
-	}
-
 	public int getGlFormat() {
-		return getDowngraded().glFormat;
+		if (net.quasar.mobile.QuasarContext.isGLES()) {
+			if (!net.quasar.mobile.QuasarCapabilities.canRenderFloat32()) {
+				if (this == RGBA32F || this == RGB32F) return net.quasar.mobile.QuasarCapabilities.canRenderFloat16() ? RGBA16F.glFormat : RGBA8.glFormat;
+				if (this == R32F) return net.quasar.mobile.QuasarCapabilities.canRenderFloat16() ? R16F.glFormat : R8.glFormat;
+				if (this == RG32F) return net.quasar.mobile.QuasarCapabilities.canRenderFloat16() ? RG16F.glFormat : RG8.glFormat;
+			}
+			if (this == RGB9_E5) return net.quasar.mobile.QuasarCapabilities.canRenderFloat16() ? RGB16F.glFormat : RGB8.glFormat;
+		}
+		return glFormat;
 	}
 
 	public PixelFormat getPixelFormat() {
@@ -146,9 +123,5 @@ public enum InternalTextureFormat {
 
 	public GlVersion getMinimumGlVersion() {
 		return minimumGlVersion;
-	}
-
-	public ShaderDataType getShaderDataType() {
-		return shaderDataType;
 	}
 }

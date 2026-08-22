@@ -8,9 +8,8 @@ import net.irisshaders.iris.shaderpack.IdMap;
 import net.irisshaders.iris.shaderpack.materialmap.NamespacedId;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -86,10 +85,7 @@ public final class IdMapUniforms {
 				return;
 			}
 
-			Identifier heldItemId = heldStack.get(DataComponents.ITEM_MODEL);
-			if (heldItemId == null) {
-				heldItemId = BuiltInRegistries.ITEM.getKey(heldItem);
-			}
+			ResourceLocation heldItemId = BuiltInRegistries.ITEM.getKey(heldItem);
 			intID = itemIdMap.applyAsInt(new NamespacedId(heldItemId.getNamespace(), heldItemId.getPath()));
 
 			IrisItemLightProvider lightProvider = (IrisItemLightProvider) heldItem;

@@ -1,20 +1,23 @@
+
 plugins {
     id("java")
-    id("net.fabricmc.fabric-loom") version("1.15.4") apply(false)
+    id("fabric-loom") version("1.16-SNAPSHOT") apply(false)
 }
 
 val MINECRAFT_VERSION by extra { "1.21.11" }
-val NEOFORGE_VERSION by extra { "21.11.5-beta" }
-val FABRIC_LOADER_VERSION by extra { "0.18.1" }
-val FABRIC_API_VERSION by extra { "0.140.2+1.21.11" }
+val NEOFORGE_VERSION by extra { "21.1.229" }
+val FABRIC_LOADER_VERSION by extra { "0.19.2" }
+val FABRIC_API_VERSION by extra { "0.103.0+1.21.1" }
 
-val SODIUM_DEPENDENCY_FABRIC by extra { "maven.modrinth:sodium:mc1.21.11-0.8.14-beta.2-fabric" }
-val SODIUM_DEPENDENCY_NEO by extra { "maven.modrinth:sodium:mc1.21.11-0.8.14-beta.2-neoforge" }
+val SODIUM_DEPENDENCY_FABRIC by extra { "net.caffeinemc:sodium-fabric:0.8.12-beta.1+mc1.21.1"}
+val SODIUM_DEPENDENCY_NEO by extra { "net.caffeinemc:sodium-neoforge-mod:0.8.12-beta.1+mc1.21.1"}
 
 // This value can be set to null to disable Parchment.
+// TODO: Re-add Parchment
 val PARCHMENT_VERSION by extra { null }
 
-val MOD_VERSION by extra { "1.0.0-quasar" }
+// https://semver.org/
+val MOD_VERSION by extra { "1.8.14" }
 
 allprojects {
     apply(plugin = "java")
@@ -33,6 +36,7 @@ subprojects {
     apply(plugin = "maven-publish")
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
 
     fun createVersionString(): String {
         val builder = StringBuilder()
@@ -74,7 +78,9 @@ subprojects {
         options.release.set(21)
     }
 
-    // Disables Gradle's custom module metadata from being published to maven.
+    // Disables Gradle's custom module metadata from being published to maven. The
+    // metadata includes mapped dependencies which are not reasonably consumable by
+    // other mod developers.
     tasks.withType<GenerateModuleMetadata>().configureEach {
         enabled = false
     }

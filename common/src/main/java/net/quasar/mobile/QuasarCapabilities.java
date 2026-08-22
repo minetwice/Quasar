@@ -1,6 +1,6 @@
 package net.quasar.mobile;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.irisshaders.iris.Iris;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL20C;
@@ -107,8 +107,7 @@ public class QuasarCapabilities {
 
 		initialized = true;
 
-		Iris.logger.info("CAPS: GLES=" + QuasarContext.isGLES() +
-			" drawBuffers=" + maxDrawBuffers +
+		Iris.logger.info("CAPS: MRT=" + maxDrawBuffers +
 			" float16=" + (canRenderFloat16 ? "y" : "n") +
 			" float32=" + (canRenderFloat32 ? "y" : "n") +
 			" compute=" + (es31OrHigher ? "y" : "n") +

@@ -8,7 +8,7 @@ import com.google.gson.JsonParser;
 import net.irisshaders.iris.Iris;
 import net.irisshaders.iris.gui.option.IrisVideoSettings;
 import net.irisshaders.iris.pathways.colorspace.ColorSpace;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,12 +47,11 @@ public class IrisConfig {
 	/**
 	 * What shaders should be nuked.
 	 */
-	private List<Identifier> shadersToSkip = new ArrayList<>();
+	private List<ResourceLocation> shadersToSkip = new ArrayList<>();
 	/**
 	 * If the update notification should be disabled or not.
 	 */
 	private boolean disableUpdateMessage;
-	private boolean useLegacyUi = false;
 
 	public IrisConfig(Path propertiesPath, Path excluded) {
 		shaderPackName = null;
@@ -60,17 +59,8 @@ public class IrisConfig {
 		allowUnknownShaders = false;
 		enableDebugOptions = false;
 		disableUpdateMessage = false;
-		useLegacyUi = false;
 		this.propertiesPath = propertiesPath;
 		this.excludedPath = excluded;
-	}
-
-	public boolean isUseLegacyUi() {
-		return useLegacyUi;
-	}
-
-	public void setUseLegacyUi(boolean useLegacyUi) {
-		this.useLegacyUi = useLegacyUi;
 	}
 
 	/**
@@ -154,7 +144,7 @@ public class IrisConfig {
 		if (Files.exists(excludedPath)) {
 			JsonArray json = JsonParser.parseString(Files.readString(excludedPath)).getAsJsonObject().getAsJsonArray("excluded");
 			for (int i = 0; i < json.size(); i++) {
-				Identifier resource = Identifier.tryParse(json.get(i).getAsString());
+				ResourceLocation resource = ResourceLocation.tryParse(json.get(i).getAsString());
 				if (resource == null) {
 					Iris.logger.warn("Unknown shader " + json.get(i).getAsString());
 				}
@@ -184,7 +174,6 @@ public class IrisConfig {
 		allowUnknownShaders = "true".equals(properties.getProperty("allowUnknownShaders"));
 		enableDebugOptions = "true".equals(properties.getProperty("enableDebugOptions"));
 		disableUpdateMessage = "true".equals(properties.getProperty("disableUpdateMessage"));
-		useLegacyUi = "true".equals(properties.getProperty("useLegacyUi"));
 		try {
 			IrisVideoSettings.shadowDistance = Integer.parseInt(properties.getProperty("maxShadowRenderDistance", "32"));
 			IrisVideoSettings.colorSpace = ColorSpace.valueOf(properties.getProperty("colorSpace", "SRGB"));
@@ -214,7 +203,6 @@ public class IrisConfig {
 		properties.setProperty("allowUnknownShaders", allowUnknownShaders ? "true" : "false");
 		properties.setProperty("enableDebugOptions", enableDebugOptions ? "true" : "false");
 		properties.setProperty("disableUpdateMessage", disableUpdateMessage ? "true" : "false");
-		properties.setProperty("useLegacyUi", useLegacyUi ? "true" : "false");
 		properties.setProperty("maxShadowRenderDistance", String.valueOf(IrisVideoSettings.shadowDistance));
 		properties.setProperty("colorSpace", IrisVideoSettings.colorSpace.name());
 		// NB: This uses ISO-8859-1 with unicode escapes as the encoding
@@ -227,7 +215,7 @@ public class IrisConfig {
 		return allowUnknownShaders;
 	}
 
-	public boolean shouldSkip(Identifier value) {
+	public boolean shouldSkip(ResourceLocation value) {
 		return shadersToSkip.contains(value); // TODO
 	}
 

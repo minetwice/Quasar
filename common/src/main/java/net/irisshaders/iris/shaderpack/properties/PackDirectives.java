@@ -39,12 +39,10 @@ public class PackDirectives {
 	private boolean sky;
 	private boolean rainDepth;
 	private boolean separateAo;
-	private boolean breaksAnisotropy;
 	private boolean voxelizeLightBlocks;
 	private boolean separateEntityDraws;
 	private boolean skipAllRendering;
 	private boolean frustumCulling;
-	private boolean supportsEndFlash;
 	private boolean occlusionCulling;
 	private boolean oldLighting;
 	private boolean concurrentCompute;
@@ -82,12 +80,10 @@ public class PackDirectives {
 		sky = properties.getSky().orElse(true);
 		rainDepth = properties.getRainDepth().orElse(false);
 		separateAo = properties.getSeparateAo().orElse(false);
-		breaksAnisotropy = properties.breaksAnisotropy().orElse(false);
 		voxelizeLightBlocks = properties.getVoxelizeLightBlocks().orElse(false);
 		separateEntityDraws = properties.getSeparateEntityDraws().orElse(false);
 		skipAllRendering = properties.skipAllRendering().orElse(false);
 		frustumCulling = properties.getFrustumCulling().orElse(true);
-		supportsEndFlash = properties.supportsEndFlash().orElse(false);
 		occlusionCulling = properties.getOcclusionCulling().orElse(true);
 		oldLighting = properties.getOldLighting().orElse(false);
 		fallbackTex = properties.getFallbackTex();
@@ -109,7 +105,6 @@ public class PackDirectives {
 		voxelizeLightBlocks = directives.voxelizeLightBlocks;
 		separateEntityDraws = directives.separateEntityDraws;
 		frustumCulling = directives.frustumCulling;
-		supportsEndFlash = directives.supportsEndFlash;
 		oldLighting = directives.oldLighting;
 		concurrentCompute = directives.concurrentCompute;
 		explicitFlips = directives.explicitFlips;
@@ -202,10 +197,6 @@ public class PackDirectives {
 
 	public boolean shouldUseSeparateAo() {
 		return separateAo;
-	}
-
-	public boolean breaksAnisotropy() {
-		return breaksAnisotropy;
 	}
 
 	public boolean shouldVoxelizeLightBlocks() {
@@ -347,9 +338,5 @@ public class PackDirectives {
 		}
 
 		return scale;
-	}
-
-	public boolean supportsEndFlash() {
-		return supportsEndFlash;
 	}
 }

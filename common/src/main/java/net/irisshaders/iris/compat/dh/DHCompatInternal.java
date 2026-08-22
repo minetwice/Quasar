@@ -1,7 +1,6 @@
 package net.irisshaders.iris.compat.dh;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.seibel.distanthorizons.api.DhApi;
 import com.seibel.distanthorizons.api.interfaces.override.rendering.IDhApiFramebuffer;
 import com.seibel.distanthorizons.api.interfaces.override.rendering.IDhApiGenericObjectShaderProgram;
@@ -42,7 +41,7 @@ public class DHCompatInternal {
 	private DhFrameBufferWrapper dhShadowFramebufferWrapper;
 	private DepthTexture depthTexNoTranslucent;
 	private boolean translucentDepthDirty;
-	private int storedDepthTex = -1;
+	private int storedDepthTex;
 	private boolean incompatible = false;
 	private int cachedVersion;
 
@@ -165,12 +164,12 @@ public class DHCompatInternal {
 		}
 		if (storedDepthTex != depthTex && dhTerrainFramebuffer != null) {
 			storedDepthTex = depthTex;
-			dhTerrainFramebuffer.addDepthAttachmentBypass(depthTex);
+			dhTerrainFramebuffer.addDepthAttachment(depthTex);
 			if (dhWaterFramebuffer != null) {
-				dhWaterFramebuffer.addDepthAttachmentBypass(depthTex);
+				dhWaterFramebuffer.addDepthAttachment(depthTex);
 			}
 			if (dhGenericFramebuffer != null) {
-				dhGenericFramebuffer.addDepthAttachmentBypass(depthTex);
+				dhGenericFramebuffer.addDepthAttachment(depthTex);
 			}
 		}
 	}
@@ -260,7 +259,7 @@ public class DHCompatInternal {
 	public void copyTranslucents(int width, int height) {
 		if (translucentDepthDirty) {
 			translucentDepthDirty = false;
-			GlStateManager._bindTexture(depthTexNoTranslucent.getTextureId());
+			RenderSystem.bindTexture(depthTexNoTranslucent.getTextureId());
 			dhTerrainFramebuffer.bindAsReadBuffer();
 			IrisRenderSystem.copyTexImage2D(GL20C.GL_TEXTURE_2D, 0, DepthBufferFormat.DEPTH32F.getGlInternalFormat(), 0, 0, width, height, 0);
 		} else {

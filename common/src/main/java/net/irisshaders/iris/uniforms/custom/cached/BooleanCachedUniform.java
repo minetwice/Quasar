@@ -1,7 +1,5 @@
 package net.irisshaders.iris.uniforms.custom.cached;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import kroppeb.stareval.function.FunctionReturn;
 import kroppeb.stareval.function.Type;
 import net.irisshaders.iris.gl.uniform.UniformUpdateFrequency;
@@ -28,7 +26,7 @@ public class BooleanCachedUniform extends CachedUniform {
 
 	@Override
 	public void push(int location) {
-		GlStateManager._glUniform1i(location, this.cached ? 1 : 0);
+		GL21.glUniform1i(location, this.cached ? 1 : 0);
 	}
 
 	@Override

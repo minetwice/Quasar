@@ -2,8 +2,6 @@ package net.irisshaders.iris.mixin.integrationtest;
 
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import net.irisshaders.iris.gl.texture.DepthBufferFormat;
-import net.irisshaders.iris.platform.IrisPlatformHelpers;
 import org.lwjgl.opengl.GL30;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -37,20 +35,26 @@ public class MixinRenderTarget_StencilBufferTest {
 
 	@ModifyArgs(method = "createBuffers",
 		at = @At(value = "INVOKE",
-			target = "Lcom/mojang/blaze3d/systems/GpuDevice;createTexture(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/textures/TextureFormat;III)Lcom/mojang/blaze3d/textures/GpuTexture;",
+			target = "Lcom/mojang/blaze3d/platform/GlStateManager;_texImage2D(IIIIIIIILjava/nio/IntBuffer;)V",
 			remap = false,
 			ordinal = 0))
 	public void init(Args args) {
 		if (STENCIL) {
 			// internalformat
 			// NB: The original Gist sets this to 3, but that is incorrect. Arguments are zero-indexed.
-			args.set(1, IrisPlatformHelpers.getInstance().mojangDepthFormat(DepthBufferFormat.DEPTH_STENCIL));
+			args.set(2, GL30.GL_DEPTH32F_STENCIL8);
+
+			// format
+			args.set(6, GL30.GL_DEPTH_STENCIL);
+
+			// type
+			args.set(7, GL30.GL_FLOAT_32_UNSIGNED_INT_24_8_REV);
 		}
 	}
 
-	//@ModifyArgs(method = "createBuffers",
-	//	at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_glFramebufferTexture2D(IIIII)V", remap = false),
-	//	slice = @Slice(from = @At(value = "FIELD", target = "Lcom/mojang/blaze3d/pipeline/RenderTarget;useDepth:Z", ordinal = 1)))
+	@ModifyArgs(method = "createBuffers",
+		at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;_glFramebufferTexture2D(IIIII)V", remap = false),
+		slice = @Slice(from = @At(value = "FIELD", target = "Lcom/mojang/blaze3d/pipeline/RenderTarget;useDepth:Z", ordinal = 1)))
 	public void init2(Args args) {
 		if (STENCIL) {
 			// attachment

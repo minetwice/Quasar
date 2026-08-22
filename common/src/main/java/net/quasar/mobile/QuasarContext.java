@@ -36,43 +36,42 @@ public class QuasarContext {
 			Iris.logger.warn("Failed to read GL strings during QuasarContext init", t);
 		}
 
-		String matchedRule = "none";
-		String vLower = glVersion.toLowerCase();
-		String rLower = glRenderer.toLowerCase();
-
-		if (glVersion.startsWith("OpenGL ES")) {
-			isGLES = true;
-			matchedRule = "GL_VERSION starts with OpenGL ES";
-		} else if (containsAny(vLower, "openltw", "ltw", "fogltlogles", "mali", "adreno", "powervr", "tegra", "virgl", "zink", "llvmpipe") ||
-		           containsAny(rLower, "openltw", "ltw", "fogltlogles", "mali", "adreno", "powervr", "tegra", "virgl", "zink", "llvmpipe")) {
-			isGLES = true;
-			matchedRule = "Mobile/Translation GPU driver match in version or renderer string";
-		} else {
-			String osName = System.getProperty("os.name", "").toLowerCase();
-			String runtimeName = System.getProperty("java.runtime.name", "").toLowerCase();
-			if (osName.contains("android") || (osName.contains("linux") && runtimeName.contains("android"))) {
-				isGLES = true;
-				matchedRule = "Android OS / Runtime detected";
-			}
-		}
-
+		isGLES = glVersion.startsWith("OpenGL ES");
 		if (isGLES) {
 			parseESVersion(glVersion);
 		}
 		isDesktop = !isGLES;
 
+		String rendererLower = glRenderer.toLowerCase();
+		String vendorLower = glVendor.toLowerCase();
+		String versionLower = glVersion.toLowerCase();
+		String matchedRule = "desktop-default";
+
+		if (isGLES || versionLower.contains("es") || rendererLower.contains("mali") ||
+			rendererLower.contains("adreno") || rendererLower.contains("powvr") ||
+			rendererLower.contains("tegra") || rendererLower.contains("virgl") ||
+			rendererLower.contains("zink") || rendererLower.contains("llvmpipe") ||
+			rendererLower.contains("openltw") || rendererLower.contains("ltw") ||
+			rendererLower.contains("fogltlogles") || vendorLower.contains("android") ||
+			System.getProperty("java.vendor", "").toLowerCase().contains("android")) {
+			isGLES = true;
+			isDesktop = false;
+			if (rendererLower.contains("openltw")) matchedRule = "openltw";
+			else if (rendererLower.contains("ltw")) matchedRule = "ltw";
+			else if (rendererLower.contains("fogltlogles")) matchedRule = "fogltlogles";
+			else if (rendererLower.contains("adreno")) matchedRule = "adreno";
+			else if (rendererLower.contains("mali")) matchedRule = "mali";
+			else if (rendererLower.contains("powvr")) matchedRule = "powervr";
+			else if (rendererLower.contains("tegra")) matchedRule = "tegra";
+			else if (rendererLower.contains("virgl")) matchedRule = "virgl";
+			else if (rendererLower.contains("zink")) matchedRule = "zink";
+			else if (rendererLower.contains("llvmpipe")) matchedRule = "llvmpipe";
+			else matchedRule = "gles-generic";
+		}
+
 		initialized = true;
 
-		Iris.logger.info("Context: isGLES=" + isGLES + " (ES " + esMajor + "." + esMinor + ") | Renderer=" + glRenderer + " | Vendor=" + glVendor + " | matchedRule=" + matchedRule);
-	}
-
-	private static boolean containsAny(String input, String... targets) {
-		for (String target : targets) {
-			if (input.contains(target)) {
-				return true;
-			}
-		}
-		return false;
+		Iris.logger.info("Context: " + glVersion + " | " + glRenderer + " | GLES=" + isGLES + " ES=" + esMajor + "." + esMinor + " Rule=" + matchedRule);
 	}
 
 	private static void parseESVersion(String versionString) {
@@ -91,11 +90,11 @@ public class QuasarContext {
 				}
 			} else {
 				esMajor = 3;
-				esMinor = 2;
+				esMinor = 0;
 			}
 		} catch (Exception e) {
 			esMajor = 3;
-			esMinor = 2;
+			esMinor = 0;
 		}
 	}
 

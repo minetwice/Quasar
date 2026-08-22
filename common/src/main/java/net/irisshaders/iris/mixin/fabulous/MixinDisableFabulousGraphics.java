@@ -1,7 +1,7 @@
 package net.irisshaders.iris.mixin.fabulous;
 
 import net.irisshaders.iris.Iris;
-import net.minecraft.client.GraphicsPreset;
+import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -34,10 +34,9 @@ public class MixinDisableFabulousGraphics {
 			return;
 		}
 
-		if (options.improvedTransparency().get()) {
+		if (options.graphicsMode().get() == GraphicsStatus.FABULOUS) {
 			// Disable fabulous graphics when shaders are enabled.
-			options.improvedTransparency().set(false);
-			options.graphicsPreset().set(GraphicsPreset.CUSTOM);
+			options.graphicsMode().set(GraphicsStatus.FANCY);
 		}
 	}
 }

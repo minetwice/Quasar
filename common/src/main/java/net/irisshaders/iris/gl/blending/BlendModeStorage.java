@@ -1,6 +1,6 @@
 package net.irisshaders.iris.gl.blending;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.irisshaders.iris.gl.IrisRenderSystem;
 import net.irisshaders.iris.mixin.GlStateManagerAccessor;
 import net.irisshaders.iris.mixin.statelisteners.BooleanStateAccessor;
@@ -9,14 +9,9 @@ public class BlendModeStorage {
 	private static boolean originalBlendEnable;
 	private static BlendMode originalBlend;
 	private static boolean blendLocked;
-	private static boolean blendUnknown;
 
 	public static boolean isBlendLocked() {
 		return blendLocked;
-	}
-
-	public static boolean isBlendUnknown() {
-		return blendUnknown;
 	}
 
 	public static void overrideBlend(BlendMode override) {
@@ -35,7 +30,6 @@ public class BlendModeStorage {
 		} else {
 			GlStateManager._enableBlend();
 			GlStateManager._blendFuncSeparate(override.srcRgb(), override.dstRgb(), override.srcAlpha(), override.dstAlpha());
-			blendUnknown = false;
 		}
 
 		blendLocked = true;
@@ -57,7 +51,6 @@ public class BlendModeStorage {
 			IrisRenderSystem.blendFuncSeparatei(index, override.srcRgb(), override.dstRgb(), override.srcAlpha(), override.dstAlpha());
 		}
 
-		blendUnknown = true;
 		blendLocked = true;
 	}
 
@@ -70,7 +63,7 @@ public class BlendModeStorage {
 	}
 
 	public static void restoreBlend() {
-		if (!blendLocked && !blendUnknown) {
+		if (!blendLocked) {
 			return;
 		}
 
@@ -84,6 +77,5 @@ public class BlendModeStorage {
 
 		GlStateManager._blendFuncSeparate(originalBlend.srcRgb(), originalBlend.dstRgb(),
 			originalBlend.srcAlpha(), originalBlend.dstAlpha());
-		blendUnknown = false;
 	}
 }

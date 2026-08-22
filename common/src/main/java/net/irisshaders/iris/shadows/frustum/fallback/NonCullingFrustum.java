@@ -17,7 +17,7 @@ public class NonCullingFrustum extends Frustum implements ViewportProvider, net.
 		super(new Matrix4f(), new Matrix4f());
 	}
 
-	public NonCullingFrustum(final Matrix4fc modelViewMatrix, final Matrix4f projectionMatrixForCulling) {
+	public NonCullingFrustum(final Matrix4f modelViewMatrix, final Matrix4f projectionMatrixForCulling) {
 		super(modelViewMatrix, projectionMatrixForCulling);
 	}
 
@@ -32,31 +32,6 @@ public class NonCullingFrustum extends Frustum implements ViewportProvider, net.
 	@Override
 	public boolean isVisible(AABB box) {
 		return true;
-	}
-
-	@Override
-	public int cubeInFrustum(BoundingBox boundingBox) {
-		return FrustumIntersection.INSIDE;
-	}
-
-	@Override
-	public boolean pointInFrustum(double x, double y, double z) {
-      return true;
-   }
-
-	@Override
-	public double getCamX() {
-		return this.position.x;
-	}
-
-	@Override
-	public double getCamY() {
-		return this.position.y;
-	}
-
-	@Override
-	public double getCamZ() {
-		return this.position.z;
 	}
 
 	@Override

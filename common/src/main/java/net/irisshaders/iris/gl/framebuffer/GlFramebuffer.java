@@ -1,8 +1,6 @@
 package net.irisshaders.iris.gl.framebuffer;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.opengl.GlTexture;
-import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.blaze3d.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.irisshaders.iris.gl.GlResource;
@@ -26,23 +24,17 @@ public class GlFramebuffer extends GlResource {
 		this.hasDepthAttachment = false;
 	}
 
-	public void addDepthAttachment(GpuTexture texture) {
+	public void addDepthAttachment(int texture) {
+		int internalFormat = TextureInfoCache.INSTANCE.getInfo(texture).getInternalFormat();
+		DepthBufferFormat depthBufferFormat = DepthBufferFormat.fromGlEnumOrDefault(internalFormat);
+
 		int fb = getGlId();
 
-		// TODO: NeoForge 1.21.5
-		//if (texture.getFormat().hasStencilAspect()) {
-		//	IrisRenderSystem.framebufferTexture2D(fb, GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_STENCIL_ATTACHMENT, GL30C.GL_TEXTURE_2D, texture, 0);
-		//} else {
-			IrisRenderSystem.framebufferTexture2D(fb, GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL30C.GL_TEXTURE_2D, ((GlTexture) texture).glId(), 0);
-		//}
-
-		this.hasDepthAttachment = true;
-	}
-
-	public void addDepthAttachmentBypass(int texture) {
-		int fb = getGlId();
-
-		IrisRenderSystem.framebufferTexture2D(fb, GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL30C.GL_TEXTURE_2D, texture, 0);
+		if (depthBufferFormat.isCombinedStencil()) {
+			IrisRenderSystem.framebufferTexture2D(fb, GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_STENCIL_ATTACHMENT, GL30C.GL_TEXTURE_2D, texture, 0);
+		} else {
+			IrisRenderSystem.framebufferTexture2D(fb, GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL30C.GL_TEXTURE_2D, texture, 0);
+		}
 
 		this.hasDepthAttachment = true;
 	}
@@ -59,35 +51,30 @@ public class GlFramebuffer extends GlResource {
 	}
 
 	public void drawBuffers(int[] buffers) {
-		int maxAllowed = net.quasar.mobile.QuasarCapabilities.getMaxDrawBuffers();
-		if (buffers.length > maxAllowed) {
-			net.irisshaders.iris.Iris.logger.warn("Draw buffers requested (" + buffers.length + ") exceeds max supported (" + maxAllowed + "), clamping extra buffers.");
-		}
-
-		int count = Math.min(buffers.length, maxAllowed);
-		int[] glBuffers = new int[count];
+		int[] glBuffers = new int[buffers.length];
 		int index = 0;
 
-		for (int i = 0; i < count; i++) {
-			int buffer = buffers[i];
-			if (buffer >= maxColorAttachments) {
-				glBuffers[index++] = GL30C.GL_NONE;
+		int maxAllowed = net.quasar.mobile.QuasarContext.isGLES() ? Math.min(maxDrawBuffers, net.quasar.mobile.QuasarCapabilities.getMaxDrawBuffers()) : maxDrawBuffers;
+		if (buffers.length > maxAllowed) {
+			if (net.quasar.mobile.QuasarContext.isGLES()) {
+				int[] clamped = new int[maxAllowed];
+				System.arraycopy(buffers, 0, clamped, 0, maxAllowed);
+				buffers = clamped;
+				glBuffers = new int[buffers.length];
 			} else {
-				glBuffers[index++] = GL30C.GL_COLOR_ATTACHMENT0 + buffer;
+				throw new IllegalArgumentException("Cannot write to more than " + maxDrawBuffers + " draw buffers on this GPU");
 			}
 		}
 
-		IrisRenderSystem.drawBuffers(getGlId(), glBuffers);
-	}
+		for (int buffer : buffers) {
+			if (buffer >= maxColorAttachments) {
+				throw new IllegalArgumentException("Only " + maxColorAttachments + " color attachments are supported on this GPU, but an attempt was made to write to a color attachment with index " + buffer);
+			}
 
-	public void clearAttachments() {
-		bind();
-		for (int attachmentIndex : attachments.keySet()) {
-			IrisRenderSystem.clearBufferfv(getGlId(), GL30C.GL_COLOR, attachmentIndex, new float[]{0.0f, 0.0f, 0.0f, 0.0f});
+			glBuffers[index++] = GL30C.GL_COLOR_ATTACHMENT0 + buffer;
 		}
-		if (hasDepthAttachment) {
-			IrisRenderSystem.clearBufferfv(getGlId(), GL30C.GL_DEPTH, 0, new float[]{1.0f});
-		}
+
+		IrisRenderSystem.drawBuffers(getGlId(), glBuffers);
 	}
 
 	public void readBuffer(int buffer) {
@@ -121,19 +108,7 @@ public class GlFramebuffer extends GlResource {
 	public int getStatus() {
 		bind();
 
-		int status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
-		if (status != GL30C.GL_FRAMEBUFFER_COMPLETE && net.quasar.mobile.QuasarContext.isGLES()) {
-			for (int attempt = 1; attempt <= 3; attempt++) {
-				net.irisshaders.iris.Iris.logger.warn("[Quasar] Framebuffer incomplete (" + status + "), attempting repair attempt " + attempt + "...");
-				status = IrisRenderSystem.checkFramebufferStatus(GL30C.GL_FRAMEBUFFER);
-				if (status == GL30C.GL_FRAMEBUFFER_COMPLETE) {
-					net.irisshaders.iris.Iris.logger.info("[Quasar] FBO repaired successfully.");
-					break;
-				}
-			}
-		}
-
-		return status;
+		return GlStateManager.glCheckFramebufferStatus(GL30C.GL_FRAMEBUFFER);
 	}
 
 	public int getId() {

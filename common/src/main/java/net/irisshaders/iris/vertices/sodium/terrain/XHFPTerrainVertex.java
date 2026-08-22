@@ -106,7 +106,7 @@ public class XHFPTerrainVertex implements ChunkVertexEncoder {
 
 	@Override
 	public long write(long ptr,
-					  int material, Vertex[] vertices, int section) {
+	                  int material, Vertex[] vertices, int section) {
 		// Calculate the center point of the texture region which is mapped to the quad
 		float texCentroidU = 0.0f;
 		float texCentroidV = 0.0f;
@@ -129,7 +129,7 @@ public class XHFPTerrainVertex implements ChunkVertexEncoder {
 				vertices[3].x, vertices[3].y, vertices[3].z);
 
 			int tangent = computeTangentForQuad(normal, vertices);
-			finalNorm = NormalHelper.encodeNormalTangent(normal, this.tangentSet.set(this.tangent), scratchValues[0], scratchValues[1], scratchValues[2]);
+			finalNorm = NormalHelper.encodeNormalTangent(normal, this.tangentSet.set(this.tangent.x, this.tangent.y, this.tangent.z), scratchValues[0], scratchValues[1], scratchValues[2]);
 		} else {
 			finalNorm = DEFAULT_NORMAL;
 		}

@@ -20,6 +20,14 @@ public final class MatrixUniforms {
 	public static void addMatrixUniforms(UniformHolder uniforms, PackDirectives directives) {
 		addMatrix(uniforms, "ModelView", CapturedRenderingState.INSTANCE::getGbufferModelView);
 		addMatrix(uniforms, "Projection", CapturedRenderingState.INSTANCE::getGbufferProjection);
+
+		uniforms.uniformMatrix(PER_FRAME, "quasar_MV", CapturedRenderingState.INSTANCE::getGbufferModelView);
+		uniforms.uniformMatrix(PER_FRAME, "quasar_P", CapturedRenderingState.INSTANCE::getGbufferProjection);
+		uniforms.uniformMatrix(PER_FRAME, "quasar_MVP", () -> {
+			Matrix4f mvp = new Matrix4f(CapturedRenderingState.INSTANCE.getGbufferProjection());
+			mvp.mul(CapturedRenderingState.INSTANCE.getGbufferModelView());
+			return mvp;
+		});
 		addDHMatrix(uniforms, "Projection", DHCompat::getProjection);
 		addShadowMatrix(uniforms, "ModelView", () ->
 			new Matrix4f(ShadowRenderer.createShadowModelView(directives.getSunPathRotation(), directives.getShadowDirectives().getIntervalSize(),
@@ -29,14 +37,6 @@ public final class MatrixUniforms {
 		addShadowMatrix(uniforms, "Projection", () -> ShadowMatrices.createOrthoMatrix(directives.getShadowDirectives().getDistance(),
 			Mth.equal(directives.getShadowDirectives().getNearPlane(), -1.0f) ? -DHCompat.getRenderDistance() * 16 : directives.getShadowDirectives().getNearPlane(),
 			Mth.equal(directives.getShadowDirectives().getFarPlane(), -1.0f) ? DHCompat.getRenderDistance() * 16 : directives.getShadowDirectives().getFarPlane()));
-
-		uniforms.uniformMatrix(PER_FRAME, "quasar_MV", CapturedRenderingState.INSTANCE::getGbufferModelView);
-		uniforms.uniformMatrix(PER_FRAME, "quasar_P", CapturedRenderingState.INSTANCE::getGbufferProjection);
-		uniforms.uniformMatrix(PER_FRAME, "quasar_MVP", () -> {
-			Matrix4f mvp = new Matrix4f(CapturedRenderingState.INSTANCE.getGbufferProjection());
-			mvp.mul(CapturedRenderingState.INSTANCE.getGbufferModelView());
-			return mvp;
-		});
 	}
 
 	private static void addMatrix(UniformHolder uniforms, String name, Supplier<Matrix4fc> supplier) {

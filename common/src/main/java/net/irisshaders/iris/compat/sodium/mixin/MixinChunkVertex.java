@@ -35,7 +35,7 @@ public class MixinChunkVertex implements ChunkVertexExtension {
 		dest.iris$setData(blockEmission, renderType, blockId, localPosX, localPosY, localPosZ);
 	}
 
-	@Inject(method = "copyVertexTo", at = @At("HEAD"))
+	@Inject(method = "copyVertexTo", at = @At("HEAD"), remap = false)
 	private static void iris$copyVertex(ChunkVertexEncoder.Vertex from, ChunkVertexEncoder.Vertex _to, CallbackInfo ci) {
 		((ChunkVertexExtension) from).iris$copyData((ChunkVertexExtension) _to);
 	}

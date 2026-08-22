@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("idea")
-    id("fabric-loom")
+    id("fabric-loom") version ("1.16-SNAPSHOT")
 }
 
 val MINECRAFT_VERSION: String by rootProject.extra
@@ -28,12 +28,17 @@ repositories {
 }
 
 base {
-    archivesName.set("quasar-fabric")
+    archivesName.set("iris-fabric")
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:${MINECRAFT_VERSION}")
-    mappings(loom.officialMojangMappings())
+    mappings(loom.layered {
+        officialMojangMappings()
+        if (PARCHMENT_VERSION != null) {
+            parchment("org.parchmentmc.data:parchment-${MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
+        }
+    })
     modImplementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
 
     fun addRuntimeFabricModule(name: String) {

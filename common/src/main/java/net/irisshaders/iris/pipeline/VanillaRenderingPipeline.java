@@ -1,7 +1,6 @@
 package net.irisshaders.iris.pipeline;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.textures.GpuTextureView;
+import com.mojang.blaze3d.platform.GlStateManager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.ChunkMeshFormats;
@@ -18,8 +17,6 @@ import net.irisshaders.iris.shaderpack.texture.TextureStage;
 import net.irisshaders.iris.uniforms.FrameUpdateNotifier;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -32,23 +29,23 @@ public class VanillaRenderingPipeline implements WorldRenderingPipeline {
 		WorldRenderingSettings.INSTANCE.setAmbientOcclusionLevel(1.0f);
 		WorldRenderingSettings.INSTANCE.setVertexFormat(ChunkMeshFormats.COMPACT);
 		WorldRenderingSettings.INSTANCE.setVoxelizeLightBlocks(false);
-		WorldRenderingSettings.INSTANCE.setBreaksAnisotropy(false);
 		WorldRenderingSettings.INSTANCE.setBlockTypeIds(Object2ObjectMaps.emptyMap());
 	}
 
 	@Override
 	public void beginLevelRendering() {
 		// Use the default Minecraft framebuffer and ensure that no programs are in use
+		Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
 		GlStateManager._glUseProgram(0);
 	}
 
 	@Override
-	public void renderShadows(LevelRendererAccessor worldRenderer, Camera camera, CameraRenderState renderState) {
+	public void renderShadows(LevelRendererAccessor worldRenderer, Camera camera) {
 		// stub: nothing to do here
 	}
 
 	@Override
-	public void addDebugText(DebugScreenDisplayer messages) {
+	public void addDebugText(List<String> messages) {
 		// stub: nothing to do here
 	}
 
@@ -88,7 +85,7 @@ public class VanillaRenderingPipeline implements WorldRenderingPipeline {
 	}
 
 	@Override
-	public void onSetAlbedoTex(GpuTextureView id) {
+	public void onSetShaderTexture(int id) {
 
 	}
 
@@ -228,20 +225,5 @@ public class VanillaRenderingPipeline implements WorldRenderingPipeline {
 	@Override
 	public void setIsMainBound(boolean mainBound) {
 
-	}
-
-	@Override
-	public void onBeginClear() {
-
-	}
-
-	@Override
-	public boolean supportsEndFlash() {
-		return false;
-	}
-
-	@Override
-	public int getAlbedoTex() {
-		return 0;
 	}
 }

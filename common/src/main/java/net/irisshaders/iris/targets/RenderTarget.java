@@ -1,9 +1,8 @@
 package net.irisshaders.iris.targets;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.irisshaders.iris.gl.GLDebug;
 import net.irisshaders.iris.gl.IrisRenderSystem;
-import net.irisshaders.iris.gl.sampler.GlSampler;
 import net.irisshaders.iris.gl.texture.InternalTextureFormat;
 import net.irisshaders.iris.gl.texture.PixelFormat;
 import net.irisshaders.iris.gl.texture.PixelType;
@@ -25,9 +24,6 @@ public class RenderTarget {
 	private int height;
 	private boolean isValid;
 	private String name;
-	private boolean allowsLinear;
-	private boolean mipmapsOnAlt;
-	private boolean mipmapsOnMain;
 
 	public RenderTarget(Builder builder) {
 		this.isValid = true;
@@ -40,12 +36,13 @@ public class RenderTarget {
 		this.width = builder.width;
 		this.height = builder.height;
 
+		int[] textures = new int[2];
+		GlStateManager._genTextures(textures);
 
-		this.mainTexture = GlStateManager._genTexture();
-		this.altTexture = GlStateManager._genTexture();
+		this.mainTexture = textures[0];
+		this.altTexture = textures[1];
 
 		boolean isPixelFormatInteger = builder.internalFormat.getPixelFormat().isInteger();
-		this.allowsLinear = !isPixelFormatInteger;
 		setupTexture(mainTexture, builder.width, builder.height, !isPixelFormatInteger, false);
 		setupTexture(altTexture, builder.width, builder.height, !isPixelFormatInteger, true);
 
@@ -119,43 +116,12 @@ public class RenderTarget {
 		requireValid();
 		isValid = false;
 
-		GlStateManager._deleteTexture(mainTexture);
-		GlStateManager._deleteTexture(altTexture);
+		GlStateManager._deleteTextures(new int[]{mainTexture, altTexture});
 	}
 
 	private void requireValid() {
 		if (!isValid) {
 			throw new IllegalStateException("Attempted to use a deleted composite render target");
-		}
-	}
-
-	public GlSampler getAltSampler() {
-		if (mipmapsOnAlt) {
-			return allowsLinear ? GlSampler.MIPPED_LINEAR : GlSampler.MIPPED_NEAREST;
-		}
-		return allowsLinear ? GlSampler.LINEAR : GlSampler.NEAREST;
-	}
-
-	public GlSampler getMainSampler() {
-		if (mipmapsOnMain) {
-			return allowsLinear ? GlSampler.MIPPED_LINEAR : GlSampler.MIPPED_NEAREST;
-		}
-		return allowsLinear ? GlSampler.LINEAR : GlSampler.NEAREST;
-	}
-
-	public void turnOnMips(boolean alt) {
-		if (alt) {
-			this.mipmapsOnAlt = true;
-		} else {
-			this.mipmapsOnMain = true;
-		}
-	}
-
-	public void turnOffMips(boolean alt) {
-		if (alt) {
-			this.mipmapsOnAlt = false;
-		} else {
-			this.mipmapsOnMain = false;
 		}
 	}
 

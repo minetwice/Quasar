@@ -18,25 +18,24 @@ import net.irisshaders.iris.gui.option.IrisVideoSettings;
 import net.irisshaders.iris.gui.screen.ShaderPackScreen;
 import net.irisshaders.iris.pathways.colorspace.ColorSpace;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.TextureFilteringMethod;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Set;
 
 public class IrisConfig implements ConfigEntryPoint {
-	public static final Identifier MONO = Identifier.fromNamespaceAndPath("iris", "textures/gui/config-icon-mono.png");
-	public static final Identifier COLOR = Identifier.fromNamespaceAndPath("iris", "textures/gui/config-icon.png");
+	public static final ResourceLocation MONO = ResourceLocation.fromNamespaceAndPath("iris", "textures/gui/config-icon-mono.png");
+	public static final ResourceLocation COLOR = ResourceLocation.fromNamespaceAndPath("iris", "textures/gui/config-icon.png");
 	@Override
 	public void registerConfigLate(ConfigBuilder builder) {
 		builder.registerOwnModOptions().setName("Iris").setIcon(MONO).setColorTheme(builder.createColorTheme().setBaseThemeRGB(0xFFf556e2))
 			.setVersion(Iris.getVersionSimple())
 			.addPage(builder.createExternalPage().setName(Component.translatable("options.iris.shaderPackSelection.title")).setScreenConsumer(i -> Minecraft.getInstance().setScreen(new ShaderPackScreen(i))))
-			.addPage(builder.createOptionPage().setName(Component.literal("Settings")).addOptionGroup(builder.createOptionGroup().addOption(builder.createExternalButtonOption(Identifier.fromNamespaceAndPath("iris", "settings")).setTooltip(Component.literal("Packs")).setName(Component.translatable("options.iris.shaderPackList"))
+			.addPage(builder.createOptionPage().setName(Component.literal("Settings")).addOptionGroup(builder.createOptionGroup().addOption(builder.createExternalButtonOption(ResourceLocation.fromNamespaceAndPath("iris", "settings")).setTooltip(Component.literal("Packs")).setName(Component.translatable("options.iris.shaderPackList"))
 				.setScreenConsumer(i -> Minecraft.getInstance().setScreen(new ShaderPackScreen(i)))))
-				.addOptionGroup(builder.createOptionGroup().addOption(builder.createEnumOption(Identifier.fromNamespaceAndPath("iris", "color_space"), ColorSpace.class)
+				.addOptionGroup(builder.createOptionGroup().addOption(builder.createEnumOption(ResourceLocation.fromNamespaceAndPath("iris", "color_space"), ColorSpace.class)
 					.setBinding(i -> {
 						IrisVideoSettings.colorSpace = i;
 					}, () -> IrisVideoSettings.colorSpace)
@@ -50,8 +49,8 @@ public class IrisConfig implements ConfigEntryPoint {
 								throw new RuntimeException(e);
 							}
 						})
-					.setElementNameProvider(ColorSpace::getName))
-					.addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("iris", "shadow_distance"))
+					.setElementNameProvider(i -> Component.literal(i.name())))
+					.addOption(builder.createIntegerOption(ResourceLocation.fromNamespaceAndPath("iris", "shadow_distance"))
 						.setDefaultValue(32)
 						.setBinding(value -> IrisVideoSettings.shadowDistance = value, () -> IrisVideoSettings.getOverriddenShadowDistance(IrisVideoSettings.shadowDistance))
 						.setName(Component.translatable("options.iris.shadowDistance"))
@@ -75,32 +74,6 @@ public class IrisConfig implements ConfigEntryPoint {
 						.setImpact(OptionImpact.HIGH)
 					)
 				)
-			).registerOptionOverlay(Identifier.parse("sodium:quality.filtering_mode"), builder.createEnumOption(Identifier.parse("sodium:quality.filtering_mode"), TextureFilteringMethod.class)
-				.setTooltip(i -> {
-					if (i == TextureFilteringMethod.RGSS) {
-						return Component.translatable("options.textureFiltering." + i.name().toLowerCase(Locale.ROOT) + ".tooltip").append(Component.literal(" (RGSS is not usable with shaders on.)"));
-					} else {
-						return Component.translatable("options.textureFiltering." + i.name().toLowerCase(Locale.ROOT) + ".tooltip");
-					}
-				})
-				.setAllowedValuesProvider(state -> {
-					if (Iris.getCurrentPack().isPresent()) {
-						return Set.of(TextureFilteringMethod.NONE, TextureFilteringMethod.ANISOTROPIC);
-					} else {
-						return Set.of(TextureFilteringMethod.values());
-					}
-				}, ConfigState.UPDATE_ON_REBUILD)
-			).registerOptionOverlay(Identifier.parse("sodium:quality.graphics"), builder.createBooleanOption(Identifier.parse("sodium:quality.graphics"))
-				.setTooltip(i -> {
-					if (Iris.getCurrentPack().isPresent()) {
-						return Component.literal("This option is not relevant when a shader pack is active.");
-					} else {
-						return Component.translatable("options.improvedTransparency.tooltip");
-					}
-				})
-				.setEnabledProvider(i -> {
-					return Iris.getCurrentPack().isEmpty();
-				}, ConfigState.UPDATE_ON_REBUILD)
 			);//.registerOptionOverlay(Identifier.parse("sodium:quality.anisotropy_bit"), builder.createIntegerOption(Identifier.parse("sodium:quality.anisotropy_bit")));
 		;
 	}

@@ -35,9 +35,7 @@ public class IrisMixinPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-		//if (targetClassName.contains("LevelRenderer")) {
-		//	targetClass.methods.forEach(m -> System.out.println(m.name + m.desc));
-		//}
+
 	}
 
 	@Override

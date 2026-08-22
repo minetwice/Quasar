@@ -49,15 +49,7 @@ public enum PixelFormat {
 	}
 
 	public int getGlFormat() {
-		if (net.quasar.mobile.QuasarContext.isGLES()) {
-			if (this == BGR || this == BGR_INTEGER) return GL11C.GL_RGB;
-			if (this == BGRA || this == BGRA_INTEGER) return GL11C.GL_RGBA;
-		}
 		return glFormat;
-	}
-
-	public boolean isBGRA() {
-		return this == BGR || this == BGRA || this == BGR_INTEGER || this == BGRA_INTEGER;
 	}
 
 	public GlVersion getMinimumGlVersion() {

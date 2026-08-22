@@ -1,6 +1,7 @@
 package net.irisshaders.iris.gl.program;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.shaders.ProgramManager;
 import net.irisshaders.iris.Iris;
 import net.irisshaders.iris.gl.GlResource;
 import net.irisshaders.iris.gl.IrisRenderSystem;
@@ -35,7 +36,7 @@ public final class ComputeProgram extends GlResource {
 
 	public static void unbind() {
 		ProgramUniforms.clearActiveUniforms();
-		GlStateManager._glUseProgram(0);
+		ProgramManager.glUseProgram(0);
 	}
 
 	public void setWorkGroupInfo(Vector2f relativeWorkGroups, Vector3i absoluteWorkGroups, FilledIndirectPointer indirectPointer) {
@@ -64,7 +65,7 @@ public final class ComputeProgram extends GlResource {
 	}
 
 	public void use() {
-		GlStateManager._glUseProgram(getGlId());
+		ProgramManager.glUseProgram(getGlId());
 
 		uniforms.update();
 		samplers.update();
@@ -72,19 +73,8 @@ public final class ComputeProgram extends GlResource {
 	}
 
 	public void dispatch(float width, float height) {
-		int barriers = 0;
-
 		if (!Iris.getPipelineManager().getPipeline().map(WorldRenderingPipeline::allowConcurrentCompute).orElse(false)) {
-			barriers |= GL43C.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL43C.GL_TEXTURE_FETCH_BARRIER_BIT | GL43C.GL_SHADER_STORAGE_BARRIER_BIT;
-		}
-
-		// before indirect dispatch make sure the indirect count is visible
-		if (indirectPointer != null) {
-			barriers |= GL43C.GL_COMMAND_BARRIER_BIT;
-		}
-
-		if (barriers != 0) {
-			IrisRenderSystem.memoryBarrier(barriers);
+			IrisRenderSystem.memoryBarrier(GL43C.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL43C.GL_TEXTURE_FETCH_BARRIER_BIT | GL43C.GL_SHADER_STORAGE_BARRIER_BIT);
 		}
 
 		if (indirectPointer != null) {

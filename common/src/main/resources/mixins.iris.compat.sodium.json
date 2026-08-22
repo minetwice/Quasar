@@ -8,25 +8,23 @@
   "client": [
     "BlockRendererAccessor",
     "MixinAbstractBlockRenderContext",
-    "EnumOptionBuilderImplAccessor",
-    "IntegerOptionBuilderImplAccessor",
-    "MixinSodiumOptions",
     "MixinBlockRenderer",
-    "MixinChunkVertexConsumer",
     "MixinChunkMeshBuildTask",
-    "MixinChunkVertex",
     "MixinDefaultChunkRenderer",
     "MixinDefaultFluidRenderer",
     "MixinGlRenderDevice",
     "MixinRenderRegionArenas",
-    "MixinRenderRegionManager",
-    "MixinRenderRegion",
     "MixinRenderSectionManager",
     "MixinRenderSectionManagerShadow",
     "MixinShaderChunkRenderer",
     "MixinSodiumGameOptions",
     "MixinSodiumWorldRenderer",
-    "MixinUniformData"
+    "EnumOptionBuilderImplAccessor",
+    "IntegerOptionBuilderImplAccessor",
+    "MixinChunkVertex",
+    "MixinRenderRegion",
+    "MixinRenderRegionManager",
+    "MixinSodiumOptions"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -30,9 +30,13 @@ public abstract class MixinPreventRebuildNearInShadowPass {
 	@Final
 	private ObjectArrayList<SectionRenderDispatcher.RenderSection> visibleSections;
 
-	@Inject(method = "cullTerrain",
+	@Inject(method = "setupRender",
 		at = @At(value = "TAIL"))
-	private void iris$preventRebuildNearInShadowPass(Camera camera, Frustum frustum, boolean bl, CallbackInfo ci) {
-
+	private void iris$preventRebuildNearInShadowPass(Camera camera, Frustum frustum, boolean bl, boolean bl2, CallbackInfo ci) {
+		if (ShadowRenderer.ACTIVE) {
+			for (SectionRenderDispatcher.RenderSection chunk : this.visibleSections) {
+				ShadowRenderer.visibleBlockEntities.addAll(chunk.getCompiled().getRenderableBlockEntities());
+			}
+		}
 	}
 }

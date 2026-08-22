@@ -9,13 +9,13 @@ public class IrisContainerObjectSelectionList<E extends ContainerObjectSelection
 	}
 
 	@Override
-	protected int scrollBarX() {
+	protected int getScrollbarPosition() {
 		// Position the scrollbar at the rightmost edge of the screen.
 		// By default, the scrollbar is positioned moderately offset from the center.
 		return width - 6;
 	}
 
 	public void select(int entry) {
-		setSelected(this.children().get(entry));
+		setSelected(this.getEntry(entry));
 	}
 }

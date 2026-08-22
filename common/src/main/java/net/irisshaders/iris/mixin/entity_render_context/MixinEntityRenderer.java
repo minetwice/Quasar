@@ -7,7 +7,6 @@ import net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings;
 import net.irisshaders.iris.uniforms.CapturedRenderingState;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,35 +15,34 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.renderer.feature.NameTagFeatureRenderer;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollection;
+@Mixin(EntityRenderer.class)
+public class MixinEntityRenderer<T extends Entity> {
+	@Unique
+	private static final NamespacedId NAME_TAG_ID = new NamespacedId("minecraft", "name_tag");
 
+	@Unique
+	private int lastId = -100;
 
-@Mixin(NameTagFeatureRenderer.class)
-public class MixinEntityRenderer {
-    @Unique
-    private static final NamespacedId NAME_TAG_ID = new NamespacedId("minecraft", "name_tag");
-    
-    @Unique
-    private int lastId = -100;
+	@Inject(method = "renderNameTag", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F"))
+	private void setNameTagId(T entity, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f, CallbackInfo ci) {
+		Object2IntFunction<NamespacedId> entityIds = WorldRenderingSettings.INSTANCE.getEntityIds();
 
-    @Inject(method = "renderTranslucent", at = @At("HEAD"))
-    private void setNameTagId(SubmitNodeCollection nodeCollection, MultiBufferSource.BufferSource bufferSource, Font font, CallbackInfo ci) { 
-        Object2IntFunction<NamespacedId> entityIds = WorldRenderingSettings.INSTANCE.getEntityIds();
+		if (entityIds == null) {
+			return;
+		}
 
-        if (entityIds == null) return;
+		this.lastId = CapturedRenderingState.INSTANCE.getCurrentRenderedEntity();
 
-        this.lastId = CapturedRenderingState.INSTANCE.getCurrentRenderedEntity();
-        CapturedRenderingState.INSTANCE.setCurrentEntity(entityIds.applyAsInt(NAME_TAG_ID));
-    }
+		int intId = entityIds.applyAsInt(NAME_TAG_ID);
 
-    @Inject(method = "renderTranslucent", at = @At("RETURN"))
-    private void resetId(SubmitNodeCollection nodeCollection, MultiBufferSource.BufferSource bufferSource, Font font, CallbackInfo ci) {
-        if (lastId != -100) {
-            CapturedRenderingState.INSTANCE.setCurrentEntity(lastId);
-            lastId = -100;
-        }
-    }
+		CapturedRenderingState.INSTANCE.setCurrentEntity(intId);
+	}
+
+	@Inject(method = "renderNameTag", at = @At("RETURN"))
+	private void resetId(T entity, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f, CallbackInfo ci) {
+		if (lastId != -100) {
+			CapturedRenderingState.INSTANCE.setCurrentEntity(lastId);
+			lastId = -100;
+		}
+	}
 }

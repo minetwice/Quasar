@@ -1,6 +1,5 @@
 package net.irisshaders.iris.pipeline;
 
-import com.mojang.blaze3d.textures.GpuTextureView;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import net.irisshaders.iris.compat.dh.DHCompat;
 import net.irisshaders.iris.features.FeatureFlags;
@@ -13,17 +12,16 @@ import net.irisshaders.iris.shaderpack.properties.ParticleRenderingSettings;
 import net.irisshaders.iris.shaderpack.texture.TextureStage;
 import net.irisshaders.iris.uniforms.FrameUpdateNotifier;
 import net.minecraft.client.Camera;
-import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 
+import java.util.List;
 import java.util.OptionalInt;
 
 public interface WorldRenderingPipeline {
 	void beginLevelRendering();
 
-    void renderShadows(LevelRendererAccessor worldRenderer, Camera playerCamera, CameraRenderState renderState);
+	void renderShadows(LevelRendererAccessor worldRenderer, Camera camera);
 
-    void addDebugText(DebugScreenDisplayer messages);
+	void addDebugText(List<String> messages);
 
 	OptionalInt getForcedShadowRenderDistanceChunksForDisplay();
 
@@ -39,7 +37,7 @@ public interface WorldRenderingPipeline {
 
 	int getCurrentSpecularTexture();
 
-	void onSetAlbedoTex(GpuTextureView id);
+	void onSetShaderTexture(int id);
 
 	void beginHand();
 
@@ -94,10 +92,4 @@ public interface WorldRenderingPipeline {
 	DHCompat getDHCompat();
 
 	void setIsMainBound(boolean mainBound);
-
-    void onBeginClear();
-
-    boolean supportsEndFlash();
-
-	int getAlbedoTex();
 }

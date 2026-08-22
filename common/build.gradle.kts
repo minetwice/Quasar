@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("idea")
-    id("fabric-loom")
+    id("fabric-loom") version "1.16-SNAPSHOT"
     id("com.github.gmazzo.buildconfig") version "6.0.9"
 }
 
@@ -50,7 +50,12 @@ buildConfig {
 dependencies {
     minecraft(group = "com.mojang", name = "minecraft", version = MINECRAFT_VERSION)
 
-    mappings(loom.officialMojangMappings())
+    mappings(loom.layered() {
+        officialMojangMappings()
+        if (PARCHMENT_VERSION != null) {
+            parchment("org.parchmentmc.data:parchment-${MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
+        }
+    })
 
     modImplementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
 
@@ -124,8 +129,8 @@ loom {
 
 tasks {
     getByName<JavaCompile>("compileDesktopJava") {
-        sourceCompatibility = JavaVersion.VERSION_21.toString()
-        targetCompatibility = JavaVersion.VERSION_21.toString()
+        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+        targetCompatibility = JavaVersion.VERSION_1_8.toString()
     }
 
     jar {

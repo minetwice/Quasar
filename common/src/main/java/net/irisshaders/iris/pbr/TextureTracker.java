@@ -1,6 +1,5 @@
 package net.irisshaders.iris.pbr;
 
-import com.mojang.blaze3d.textures.GpuTextureView;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.irisshaders.iris.Iris;
@@ -34,6 +33,25 @@ public class TextureTracker {
 	@Nullable
 	public AbstractTexture getTexture(int id) {
 		return textures.get(id);
+	}
+
+	public void onSetShaderTexture(int unit, int id) {
+		if (lockBindCallback) {
+			return;
+		}
+		if (unit == 0) {
+			lockBindCallback = true;
+			if (bindTextureListener != null) {
+				bindTextureListener.run();
+			}
+			WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+			if (pipeline != null) {
+				pipeline.onSetShaderTexture(id);
+			}
+			// Reset texture state
+			IrisRenderSystem.bindTextureToUnit(TextureType.TEXTURE_2D.getGlType(), 0, id);
+			lockBindCallback = false;
+		}
 	}
 
 	public void onDeleteTexture(int id) {
