@@ -1,7 +1,7 @@
 package net.quasar.mobile.gui.anim;
 
 import net.quasar.mobile.gui.theme.QuasarTheme;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.Random;
 
@@ -9,7 +9,7 @@ import java.util.Random;
  * Quasar Mobile - fork modification
  *
  * Animated space background with parallax starfields and drifting nebula.
- * Pure DrawContext/GuiGraphicsExtractor rendering, Android/GLES safe.
+ * Pure DrawContext/GuiGraphics rendering, Android/GLES safe.
  */
 public class QuasarBackground {
 	private static final int STAR_COUNT_L1 = 60;
@@ -44,7 +44,7 @@ public class QuasarBackground {
 		initialized = true;
 	}
 
-	public static void render(GuiGraphicsExtractor graphics, int width, int height) {
+	public static void render(GuiGraphics graphics, int width, int height) {
 		initStars();
 		long time = System.currentTimeMillis();
 
@@ -66,7 +66,7 @@ public class QuasarBackground {
 		renderStarLayer(graphics, width, height, starX3, starY3, STAR_COUNT_L3, time, 3, 0.00012f, 2);
 	}
 
-	private static void renderStarLayer(GuiGraphicsExtractor graphics, int width, int height, float[] starX, float[] starY, int count, long time, int layer, float speed, int size) {
+	private static void renderStarLayer(GuiGraphics graphics, int width, int height, float[] starX, float[] starY, int count, long time, int layer, float speed, int size) {
 		for (int i = 0; i < count; i++) {
 			float x = (starX[i] + time * speed * (layer * 0.5f)) % 1.0f;
 			float y = (starY[i] + time * speed * 0.2f) % 1.0f;

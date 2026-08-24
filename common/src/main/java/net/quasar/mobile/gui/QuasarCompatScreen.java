@@ -4,7 +4,7 @@ import net.irisshaders.iris.Iris;
 import net.irisshaders.iris.gui.element.screen.IrisButton;
 import net.quasar.mobile.QuasarRecoveryLadder;
 import net.minecraft.client.gui.ActiveTextCollector;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -80,13 +80,13 @@ public class QuasarCompatScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		this.extractBackground(guiGraphics, mouseX, mouseY, delta);
 		ActiveTextCollector textCollector = guiGraphics.textRenderer();
 		guiGraphics.centeredText(this.font, this.title, this.width / 2, 20, 0xFFFF5555);
 		if (messageLabel != null) {
 			messageLabel.visitLines(TextAlignment.CENTER, this.width / 2, 45, 11, textCollector);
 		}
-		super.extractRenderState(guiGraphics, mouseX, mouseY, delta);
+		super.render(guiGraphics, mouseX, mouseY, delta);
 	}
 }

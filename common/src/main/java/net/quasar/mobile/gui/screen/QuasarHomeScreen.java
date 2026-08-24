@@ -7,7 +7,7 @@ import net.quasar.mobile.gui.anim.QuasarAnimator;
 import net.quasar.mobile.gui.anim.QuasarBackground;
 import net.quasar.mobile.gui.theme.QuasarTheme;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -127,7 +127,7 @@ public class QuasarHomeScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 		// 1. Cosmic background
 		QuasarBackground.render(graphics, this.width, this.height);
 
@@ -182,7 +182,7 @@ public class QuasarHomeScreen extends Screen {
 			graphics.centeredText(this.font, Component.literal("[" + card.status + "]"), chipX + chipWidth / 2, cy + 17, card.statusColor);
 		}
 
-		super.extractRenderState(graphics, mouseX, mouseY, delta);
+		super.render(graphics, mouseX, mouseY, delta);
 	}
 
 	@Override

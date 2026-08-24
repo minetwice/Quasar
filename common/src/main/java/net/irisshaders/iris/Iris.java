@@ -791,7 +791,7 @@ public class Iris {
 			logger.warn("", e);
 		}
 
-		irisConfig = new IrisConfig(IrisPlatformHelpers.getInstance().getConfigDir().resolve("quasar.properties"), IrisPlatformHelpers.getInstance().getConfigDir().resolve("quasar-excluded.json"));
+		irisConfig = new IrisConfig(IrisPlatformHelpers.getInstance().getConfigDir().resolve("iris.properties"), IrisPlatformHelpers.getInstance().getConfigDir().resolve("iris-excluded.json"));
 
 		try {
 			irisConfig.initialize();

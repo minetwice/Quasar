@@ -29,21 +29,24 @@ public class GlShader extends GlResource {
 
 	private static int createShader(ShaderType type, String name, String src) {
 		int handle = GlStateManager.glCreateShader(type.id);
-
-		int compiledHandle = net.quasar.mobile.QuasarRecoveryLadder.compileWithLadder(type, name, src, transpiledSource -> {
-			ShaderWorkarounds.safeShaderSource(handle, transpiledSource);
-			GlStateManager.glCompileShader(handle);
-			int result = GlStateManager.glGetShaderi(handle, GL20C.GL_COMPILE_STATUS);
-			if (result != GL20C.GL_TRUE) {
-				String log = IrisRenderSystem.getShaderInfoLog(handle);
-				throw new ShaderCompileException(name, log);
-			}
-			return handle;
-		});
+		ShaderWorkarounds.safeShaderSource(handle, src);
+		GlStateManager.glCompileShader(handle);
 
 		GLDebug.nameObject(KHRDebug.GL_SHADER, handle, name + "(" + type.name().toLowerCase(Locale.ROOT) + ")");
 
-		return compiledHandle >= 0 ? compiledHandle : handle;
+		String log = IrisRenderSystem.getShaderInfoLog(handle);
+
+		if (!log.isEmpty()) {
+			LOGGER.warn("Shader compilation log for " + name + ": " + log);
+		}
+
+		int result = GlStateManager.glGetShaderi(handle, GL20C.GL_COMPILE_STATUS);
+
+		if (result != GL20C.GL_TRUE) {
+			throw new ShaderCompileException(name, log);
+		}
+
+		return handle;
 	}
 
 	public String getName() {

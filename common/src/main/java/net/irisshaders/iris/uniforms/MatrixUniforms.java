@@ -20,14 +20,6 @@ public final class MatrixUniforms {
 	public static void addMatrixUniforms(UniformHolder uniforms, PackDirectives directives) {
 		addMatrix(uniforms, "ModelView", CapturedRenderingState.INSTANCE::getGbufferModelView);
 		addMatrix(uniforms, "Projection", CapturedRenderingState.INSTANCE::getGbufferProjection);
-
-		uniforms.uniformMatrix(PER_FRAME, "quasar_MV", CapturedRenderingState.INSTANCE::getGbufferModelView);
-		uniforms.uniformMatrix(PER_FRAME, "quasar_P", CapturedRenderingState.INSTANCE::getGbufferProjection);
-		uniforms.uniformMatrix(PER_FRAME, "quasar_MVP", () -> {
-			Matrix4f mvp = new Matrix4f(CapturedRenderingState.INSTANCE.getGbufferProjection());
-			mvp.mul(CapturedRenderingState.INSTANCE.getGbufferModelView());
-			return mvp;
-		});
 		addDHMatrix(uniforms, "Projection", DHCompat::getProjection);
 		addShadowMatrix(uniforms, "ModelView", () ->
 			new Matrix4f(ShadowRenderer.createShadowModelView(directives.getSunPathRotation(), directives.getShadowDirectives().getIntervalSize(),

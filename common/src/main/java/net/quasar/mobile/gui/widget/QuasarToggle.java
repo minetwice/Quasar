@@ -2,7 +2,7 @@ package net.quasar.mobile.gui.widget;
 
 import net.quasar.mobile.gui.theme.QuasarTheme;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
@@ -25,7 +25,7 @@ public class QuasarToggle extends AbstractWidget {
 	}
 
 	@Override
-	protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 		int trackWidth = 50;
 		int trackHeight = 24;
 		int trackX = getX() + getWidth() - trackWidth - 10;

@@ -103,7 +103,7 @@ fun includeDep(dependency: String) {
 
 fun includeAdditional(dependency: String) {
     includeDep(dependency)
-    dependencies.add("runtimeOnly", dependency)
+    dependencies.add("additionalRuntimeClasspath", dependency)
 }
 
 tasks.named("compileTestJava").configure {

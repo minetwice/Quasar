@@ -54,16 +54,8 @@ public class GlFramebuffer extends GlResource {
 		int[] glBuffers = new int[buffers.length];
 		int index = 0;
 
-		int maxAllowed = net.quasar.mobile.QuasarContext.isGLES() ? Math.min(maxDrawBuffers, net.quasar.mobile.QuasarCapabilities.getMaxDrawBuffers()) : maxDrawBuffers;
-		if (buffers.length > maxAllowed) {
-			if (net.quasar.mobile.QuasarContext.isGLES()) {
-				int[] clamped = new int[maxAllowed];
-				System.arraycopy(buffers, 0, clamped, 0, maxAllowed);
-				buffers = clamped;
-				glBuffers = new int[buffers.length];
-			} else {
-				throw new IllegalArgumentException("Cannot write to more than " + maxDrawBuffers + " draw buffers on this GPU");
-			}
+		if (buffers.length > maxDrawBuffers) {
+			throw new IllegalArgumentException("Cannot write to more than " + maxDrawBuffers + " draw buffers on this GPU");
 		}
 
 		for (int buffer : buffers) {

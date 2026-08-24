@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("idea")
-    id("fabric-loom") version ("1.16-SNAPSHOT")
+    id("fabric-loom")
 }
 
 val MINECRAFT_VERSION: String by rootProject.extra
@@ -28,17 +28,12 @@ repositories {
 }
 
 base {
-    archivesName.set("iris-fabric")
+    archivesName.set("quasar-fabric")
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:${MINECRAFT_VERSION}")
-    mappings(loom.layered {
-        officialMojangMappings()
-        if (PARCHMENT_VERSION != null) {
-            parchment("org.parchmentmc.data:parchment-${MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
-        }
-    })
+    mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
 
     fun addRuntimeFabricModule(name: String) {
@@ -87,10 +82,6 @@ tasks.named("test").configure {
     enabled = false
 }
 
-tasks.named("validateAccessWidener") {
-    enabled = false
-}
-
 loom {
     if (project(":common").file("src/main/resources/iris.accesswidener").exists())
         accessWidenerPath.set(project(":common").file("src/main/resources/iris.accesswidener"))
@@ -128,3 +119,5 @@ tasks {
 
     remapJar.get().destinationDirectory = rootDir.resolve("build").resolve("libs")
 }
+
+tasks.named("validateAccessWidener").configure { enabled = false }

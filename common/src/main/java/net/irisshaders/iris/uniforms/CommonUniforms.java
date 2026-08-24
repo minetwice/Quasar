@@ -133,9 +133,6 @@ public final class CommonUniforms {
 		SmoothedVec2f eyeBrightnessSmooth = new SmoothedVec2f(directives.getEyeBrightnessHalfLife(), directives.getEyeBrightnessHalfLife(), CommonUniforms::getEyeBrightness, updateNotifier);
 
 		uniforms
-			.uniform1f(PER_FRAME, "quasar_RenderScale", net.quasar.mobile.QuasarProfiler::getRenderScale)
-			.uniform1f(ONCE, "quasar_ESVersion", () -> net.quasar.mobile.QuasarContext.isGLES() ? (float) (net.quasar.mobile.QuasarContext.getEsMajor() + net.quasar.mobile.QuasarContext.getEsMinor() * 0.1f) : 0.0f)
-			.uniform1i(ONCE, "quasar_DeviceTier", net.quasar.mobile.QuasarProfiler::getDeviceTier)
 			.uniform1b(PER_FRAME, "hideGUI", () -> client.options.hideGui)
 			.uniform1b(PER_FRAME, "isRightHanded", () -> client.options.mainHand().get() == HumanoidArm.RIGHT)
 			.uniform1i(PER_FRAME, "isEyeInWater", CommonUniforms::isEyeInWater)

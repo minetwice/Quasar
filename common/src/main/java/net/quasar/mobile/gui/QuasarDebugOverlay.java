@@ -6,7 +6,7 @@ import net.quasar.mobile.QuasarProfiler;
 import net.quasar.mobile.QuasarRecoveryLadder;
 import net.quasar.mobile.gui.theme.QuasarTheme;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 
 /**
  * Quasar Mobile - fork modification
@@ -28,7 +28,7 @@ public class QuasarDebugOverlay {
 		enabled = !enabled;
 	}
 
-	public static void render(GuiGraphicsExtractor graphics) {
+	public static void render(GuiGraphics graphics) {
 		if (!enabled) return;
 
 		Minecraft mc = Minecraft.getInstance();

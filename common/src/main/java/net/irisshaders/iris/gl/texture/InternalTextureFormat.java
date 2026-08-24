@@ -106,14 +106,6 @@ public enum InternalTextureFormat {
 	}
 
 	public int getGlFormat() {
-		if (net.quasar.mobile.QuasarContext.isGLES()) {
-			if (!net.quasar.mobile.QuasarCapabilities.canRenderFloat32()) {
-				if (this == RGBA32F || this == RGB32F) return net.quasar.mobile.QuasarCapabilities.canRenderFloat16() ? RGBA16F.glFormat : RGBA8.glFormat;
-				if (this == R32F) return net.quasar.mobile.QuasarCapabilities.canRenderFloat16() ? R16F.glFormat : R8.glFormat;
-				if (this == RG32F) return net.quasar.mobile.QuasarCapabilities.canRenderFloat16() ? RG16F.glFormat : RG8.glFormat;
-			}
-			if (this == RGB9_E5) return net.quasar.mobile.QuasarCapabilities.canRenderFloat16() ? RGB16F.glFormat : RGB8.glFormat;
-		}
 		return glFormat;
 	}
 

@@ -15,7 +15,6 @@
  */
 package de.odysseus.ithaka.digraph.io.dot;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -42,13 +41,14 @@ public class DotAttribute {
 		this.quotes = false;
 	}
 
-	public DotAttribute(String name, Color value) {
+	public DotAttribute(String name, int rgbColor) {
 		this.name = name;
-		this.value = String.format("#%6X", value.getRGB() & 0x00FFFFFF);
+		this.value = String.format("#%06X", rgbColor & 0x00FFFFFF);
 		this.quotes = true;
 	}
 
 	private static boolean isIdentifier(String value) {
+		if (value == null || value.isEmpty()) return false;
 		if (!Character.isJavaIdentifierStart(value.charAt(0))) {
 			return false;
 		}

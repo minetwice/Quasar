@@ -2,7 +2,7 @@ package net.quasar.mobile.gui.widget;
 
 import net.quasar.mobile.gui.theme.QuasarTheme;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
@@ -28,7 +28,7 @@ public class QuasarDropdown extends AbstractWidget {
 	}
 
 	@Override
-	protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 		int boxX = getX() + getWidth() - 110;
 		int boxY = getY() + (getHeight() - 28) / 2;
 		int boxWidth = 100;
